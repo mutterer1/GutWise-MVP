@@ -1,0 +1,279 @@
+import type { UserDailyFeatures } from '../../types/dailyFeatures';
+import type { UserBaselineSet } from '../../types/baselines';
+import type {
+  InsightCandidate,
+  CandidateEvidence,
+} from '../../types/insightCandidates';
+import {
+  safeRate,
+  computeDataSufficiency,
+  computeStatus,
+  computeConfidence,
+  computeLift,
+  computeRecencyWeight,
+  computeContradictionRate,
+  computeEvidenceQuality,
+  buildEvidenceGaps,
+  buildUncertaintyStatement,
+} from './sharedCandidateUtils';
+
+const INSIGHT_KEY = 'medication_any_same_day_bm_shift';
+const MIN_ELIGIBLE_DAYS = 5;
+const MIN_EXPOSURE_DAYS = 2;
+
+const GI_RELEVANT_MEDICATION_FAMILIES = new Set([
+  'laxative',
+  'antidiarrheal',
+  'opioid',
+  'metformin',
+  'magnesium',
+  'iron',
+  'fiber_supplement',
+  'antibiotic',
+  'ppi',
+  'h2_blocker',
+  'nsaid',
+  'ssri',
+  'gi_antiinflammatory',
+]);
+
+export function isMedicationDay(day: UserDailyFeatures): boolean {
+  return day.medication_event_count > 0;
+}
+
+export function isGiRelevantMedicationDay(day: UserDailyFeatures): boolean {
+  if (day.gi_risk_medication_count > 0) return true;
+  if (day.motility_slowing_medication_count > 0) return true;
+  if (day.motility_speeding_medication_count > 0) return true;
+  if (day.acid_suppression_medication_count > 0) return true;
+  if (day.microbiome_disruption_medication_count > 0) return true;
+
+  return day.medication_families.some((family) =>
+    GI_RELEVANT_MEDICATION_FAMILIES.has(family)
+  );
+}
+
+export function isBmShiftDay(
+  day: UserDailyFeatures,
+  baselines: UserBaselineSet
+): boolean {
+  const median = baselines.bowel_movement.median_bm_count;
+  if (median === null) return false;
+  return Math.abs(day.bm_count - median) >= 1;
+}
+
+function hasBmAndMedicationContext(day: UserDailyFeatures): boolean {
+  return day.bm_count >= 0;
+}
+
+function getSupportingLogTypes(eligibleDays: UserDailyFeatures[]): string[] {
+  const logTypes = new Set<string>();
+
+  for (const day of eligibleDays) {
+    if (day.medication_event_count > 0) {
+      logTypes.add('medication');
+    }
+
+    if (
+      day.bm_count > 0 ||
+      day.avg_bristol !== null ||
+      day.urgency_event_count > 0 ||
+      day.incomplete_evacuation_count > 0 ||
+      day.blood_present_count > 0 ||
+      day.mucus_present_count > 0
+    ) {
+      logTypes.add('gut');
+    }
+
+    if (day.symptom_event_count > 0 || day.symptom_burden_score > 0) {
+      logTypes.add('symptom');
+    }
+
+    if (day.meal_count > 0) {
+      logTypes.add('food');
+    }
+
+    if (day.hydration_event_count > 0) {
+      logTypes.add('hydration');
+    }
+
+    if (
+      day.stress_event_count > 0 ||
+      day.stress_avg !== null ||
+      day.stress_peak !== null
+    ) {
+      logTypes.add('stress');
+    }
+  }
+
+  return Array.from(logTypes);
+}
+
+export function analyzeMedicationAnyBmShiftCandidate(
+  features: UserDailyFeatures[],
+  baselines: UserBaselineSet
+): InsightCandidate | null {
+  if (features.length === 0) return null;
+  if (baselines.bowel_movement.median_bm_count === null) return null;
+
+  const eligibleDays = features.filter(hasBmAndMedicationContext);
+  if (eligibleDays.length < MIN_ELIGIBLE_DAYS) return null;
+
+  let exposureCount = 0;
+  let supportCount = 0;
+  let contradictionCount = 0;
+  let nonExposedCount = 0;
+  let nonExposedShiftCount = 0;
+
+  const supportDates: string[] = [];
+  const exposureDates: string[] = [];
+  const baselineDates: string[] = [];
+
+  for (const day of eligibleDays) {
+    const medDay = isGiRelevantMedicationDay(day);
+    const bmShift = isBmShiftDay(day, baselines);
+
+    if (medDay) {
+      exposureCount++;
+      exposureDates.push(day.date);
+
+      if (bmShift) {
+        supportCount++;
+        supportDates.push(day.date);
+      } else {
+        contradictionCount++;
+      }
+    } else {
+      nonExposedCount++;
+      baselineDates.push(day.date);
+
+      if (bmShift) {
+        nonExposedShiftCount++;
+      }
+    }
+  }
+
+  if (exposureCount < MIN_EXPOSURE_DAYS) return null;
+
+  const contrastCount = nonExposedCount;
+  const exposedRate = safeRate(supportCount, exposureCount);
+  const baselineRate = safeRate(nonExposedShiftCount, contrastCount);
+  const lift = computeLift(exposedRate, baselineRate);
+
+  const sorted = [...eligibleDays].sort((a, b) => a.date.localeCompare(b.date));
+  const analysisEndDate = sorted[sorted.length - 1].date;
+
+  const supportingLogTypes = getSupportingLogTypes(eligibleDays);
+  const missingLogTypes = ['food', 'hydration', 'stress'].filter(
+    (logType) => !supportingLogTypes.includes(logType)
+  );
+
+  const sufficiency = computeDataSufficiency(
+    eligibleDays.length,
+    exposureCount,
+    contrastCount
+  );
+
+  const recencyWeight = computeRecencyWeight(supportDates, analysisEndDate);
+  const contradictionRate = computeContradictionRate(
+    contradictionCount,
+    exposureCount
+  );
+
+  const evidenceQuality = computeEvidenceQuality(
+    sufficiency,
+    supportCount,
+    contradictionCount,
+    exposureCount,
+    contrastCount,
+    recencyWeight,
+    supportingLogTypes
+  );
+
+  const evidenceGaps = buildEvidenceGaps({
+    eligibleDayCount: eligibleDays.length,
+    exposureCount,
+    contrastCount,
+    supportCount,
+    contradictionCount,
+    supportingLogTypes,
+    endDate: analysisEndDate,
+    sampleDates: supportDates,
+  });
+
+  const uncertaintyStatement = buildUncertaintyStatement(evidenceGaps);
+
+  const status = computeStatus(
+    sufficiency,
+    supportCount,
+    exposedRate,
+    baselineRate,
+    contradictionCount,
+    exposureCount,
+    contrastCount,
+    evidenceQuality
+  );
+
+  const confidence = computeConfidence(
+    sufficiency,
+    supportCount,
+    contradictionCount,
+    lift,
+    exposureCount,
+    contrastCount,
+    recencyWeight,
+    supportingLogTypes
+  );
+
+  const evidence: CandidateEvidence = {
+    support_count: supportCount,
+    exposure_count: exposureCount,
+    contradiction_count: contradictionCount,
+    baseline_rate: baselineRate,
+    exposed_rate: exposedRate,
+    lift,
+    sample_dates: supportDates.slice(0, 10),
+    contrast_count: contrastCount,
+    eligible_day_count: eligibleDays.length,
+    exposed_day_count: exposureCount,
+    baseline_day_count: contrastCount,
+    contradiction_rate: contradictionRate,
+    recency_weight: recencyWeight,
+    evidence_quality: evidenceQuality,
+    supporting_log_types: supportingLogTypes,
+    missing_log_types: missingLogTypes,
+    exposed_dates: exposureDates.slice(0, 10),
+    baseline_dates: baselineDates.slice(0, 10),
+    uncertainty_statement: uncertaintyStatement,
+    evidence_gaps: evidenceGaps,
+    notes: [
+      'Exposure days are limited to GI-relevant medication signals derived from matched medication families and gut-effect heuristics.',
+    ],
+    statistics: {
+      eligible_day_count: eligibleDays.length,
+      non_exposed_count: nonExposedCount,
+      non_exposed_shift_count: nonExposedShiftCount,
+      gi_risk_medication_day_count: exposureCount,
+    },
+  };
+
+  return {
+    user_id: baselines.user_id,
+    insight_key: INSIGHT_KEY,
+    category: 'medication',
+    subtype: 'medication_any_bm_shift',
+    trigger_factors: [
+      'gi_risk_medication_count',
+      'medication_families',
+      'motility_slowing_medication_count',
+      'motility_speeding_medication_count',
+    ],
+    target_outcomes: ['bm_count'],
+    status,
+    confidence_score: confidence,
+    data_sufficiency: sufficiency,
+    evidence,
+    created_from_start_date: sorted[0].date,
+    created_from_end_date: analysisEndDate,
+  };
+}

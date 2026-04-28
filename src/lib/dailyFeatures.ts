@@ -1,0 +1,940 @@
+import type { CanonicalEvent } from '../types/canonicalEvents';
+import type {
+  MedicationExposureProfile,
+  UserDailyFeatures,
+} from '../types/dailyFeatures';
+
+// ---------------------------------------------------------------------------
+// Helper utilities
+// ---------------------------------------------------------------------------
+
+function numericAvg(values: number[]): number | null {
+  if (values.length === 0) return null;
+  return values.reduce((sum, v) => sum + v, 0) / values.length;
+}
+
+function numericMax(values: number[]): number | null {
+  if (values.length === 0) return null;
+  return Math.max(...values);
+}
+
+function numericMin(values: number[]): number | null {
+  if (values.length === 0) return null;
+  return Math.min(...values);
+}
+
+function uniqueSorted(values: string[]): string[] {
+  return [...new Set(values)].sort();
+}
+
+function roundTo(value: number, decimals = 3): number {
+  const factor = 10 ** decimals;
+  return Math.round(value * factor) / factor;
+}
+
+function lastEventByOccurredAt(events: CanonicalEvent[]): CanonicalEvent | null {
+  if (events.length === 0) return null;
+  return events.reduce((latest, e) => (e.occurred_at > latest.occurred_at ? e : latest));
+}
+
+function payloadNum(payload: Record<string, unknown>, key: string): number | null {
+  const v = payload[key];
+  if (typeof v === 'number' && !isNaN(v)) return v;
+  return null;
+}
+
+function payloadBool(payload: Record<string, unknown>, key: string): boolean {
+  return payload[key] === true;
+}
+
+function payloadOptionalBool(
+  payload: Record<string, unknown>,
+  key: string
+): boolean | null {
+  const v = payload[key];
+  if (typeof v === 'boolean') return v;
+  return null;
+}
+
+function payloadStr(payload: Record<string, unknown>, key: string): string | null {
+  const v = payload[key];
+  if (typeof v === 'string' && v.length > 0) return v;
+  return null;
+}
+
+function payloadStrArray(payload: Record<string, unknown>, key: string): string[] {
+  const v = payload[key];
+  if (Array.isArray(v)) return v.filter((item): item is string => typeof item === 'string');
+  return [];
+}
+
+const CAFFEINE_KEYWORDS = [
+  'coffee',
+  'espresso',
+  'latte',
+  'cappuccino',
+  'americano',
+  'mocha',
+  'tea',
+  'green tea',
+  'black tea',
+  'matcha',
+  'energy drink',
+  'energy',
+  'cola',
+  'soda',
+  'caffeine',
+];
+
+const ALCOHOL_KEYWORDS = [
+  'beer',
+  'wine',
+  'spirits',
+  'cocktail',
+  'alcohol',
+  'whiskey',
+  'vodka',
+  'rum',
+  'gin',
+  'tequila',
+  'champagne',
+  'cider',
+  'sake',
+  'mead',
+];
+
+function matchesKeywords(value: string, keywords: string[]): boolean {
+  const lower = value.toLowerCase();
+  return keywords.some((kw) => lower.includes(kw));
+}
+
+// ---------------------------------------------------------------------------
+// Per-type aggregators
+// ---------------------------------------------------------------------------
+
+function aggregateBM(events: CanonicalEvent[]) {
+  const bristolValues: number[] = [];
+  let hardCount = 0;
+  let looseCount = 0;
+  let urgencyCount = 0;
+  let incompleteCount = 0;
+  let bloodCount = 0;
+  let mucusCount = 0;
+  const hours: number[] = [];
+
+  for (const e of events) {
+    const bristol = payloadNum(e.payload, 'bristol_type');
+    if (bristol !== null) {
+      bristolValues.push(bristol);
+      if (bristol <= 2) hardCount++;
+      if (bristol >= 6) looseCount++;
+    }
+
+    const urgency = payloadNum(e.payload, 'urgency');
+    if (urgency !== null && urgency >= 4) urgencyCount++;
+
+    if (payloadBool(e.payload, 'incomplete_evacuation')) incompleteCount++;
+    if (payloadBool(e.payload, 'blood_present')) bloodCount++;
+    if (payloadBool(e.payload, 'mucus_present')) mucusCount++;
+
+    hours.push(e.local_hour);
+  }
+
+  return {
+    bm_count: events.length,
+    avg_bristol: numericAvg(bristolValues),
+    hard_stool_count: hardCount,
+    loose_stool_count: looseCount,
+    urgency_event_count: urgencyCount,
+    incomplete_evacuation_count: incompleteCount,
+    blood_present_count: bloodCount,
+    mucus_present_count: mucusCount,
+    first_bm_hour: numericMin(hours),
+    last_bm_hour: numericMax(hours),
+  };
+}
+
+function aggregateSymptoms(events: CanonicalEvent[]) {
+  const severities: number[] = [];
+  const types: string[] = [];
+
+  for (const e of events) {
+    const sev = payloadNum(e.payload, 'severity');
+    if (sev !== null) severities.push(sev);
+
+    const st = payloadStr(e.payload, 'symptom_type');
+    if (st) types.push(st);
+  }
+
+  return {
+    symptom_event_count: events.length,
+    symptom_burden_score: severities.reduce((sum, v) => sum + v, 0),
+    max_symptom_severity: numericMax(severities),
+    symptom_types: uniqueSorted(types),
+  };
+}
+
+function aggregateFood(events: CanonicalEvent[]) {
+  const allFoodItemNames: string[] = [];
+  const allTags: string[] = [];
+  const allMatchedIngredientIds: string[] = [];
+  const allMatchedFoodReferenceIds: string[] = [];
+  const allIngredientSignals: string[] = [];
+  const allCommonGutEffects: string[] = [];
+  const allNutritionSourceLabels: string[] = [];
+  let gutTriggerLoad = 0;
+  let gutTriggerBurdenScore = 0;
+  let highFodmapCount = 0;
+  let highFodmapBurdenScore = 0;
+  let dairyCount = 0;
+  let dairyBurdenScore = 0;
+  let glutenCount = 0;
+  let glutenBurdenScore = 0;
+  let artificialSweetenerCount = 0;
+  let artificialSweetenerBurdenScore = 0;
+  let highFatCount = 0;
+  let highFatBurdenScore = 0;
+  let spicyCount = 0;
+  let spicyBurdenScore = 0;
+  let caffeineFoodCount = 0;
+  let caffeineFoodBurdenScore = 0;
+  let alcoholFoodCount = 0;
+  let alcoholFoodBurdenScore = 0;
+  let fiberDenseCount = 0;
+  let fiberDenseBurdenScore = 0;
+  let foodItemCountTotal = 0;
+  let structuredFoodItemCount = 0;
+  let structuredIngredientCount = 0;
+  let caloriesTotal = 0;
+  let proteinTotal = 0;
+  let fatTotal = 0;
+  let carbsTotal = 0;
+  let fiberTotal = 0;
+  let sugarTotal = 0;
+  let sodiumTotal = 0;
+  let nutritionCoveredItemCount = 0;
+  let nutritionMissingItemCount = 0;
+  const nutritionConfidences: number[] = [];
+  let lateMeal = false;
+
+  for (const e of events) {
+    const foodItemNames =
+      payloadStrArray(e.payload, 'food_item_names').length > 0
+        ? payloadStrArray(e.payload, 'food_item_names')
+        : payloadStrArray(e.payload, 'food_items');
+    const tags = payloadStrArray(e.payload, 'tags');
+    const matchedIngredientIds = payloadStrArray(e.payload, 'matched_ingredient_ids');
+    const matchedFoodReferenceIds = payloadStrArray(e.payload, 'matched_food_reference_ids');
+    const ingredientSignals = payloadStrArray(e.payload, 'ingredient_signals');
+    const commonGutEffects = payloadStrArray(e.payload, 'common_gut_effects');
+    const nutritionSourceLabels = payloadStrArray(e.payload, 'nutrition_source_labels');
+
+    allFoodItemNames.push(...foodItemNames);
+    allTags.push(...tags);
+    allMatchedIngredientIds.push(...matchedIngredientIds);
+    allMatchedFoodReferenceIds.push(...matchedFoodReferenceIds);
+    allIngredientSignals.push(...ingredientSignals);
+    allCommonGutEffects.push(...commonGutEffects);
+    allNutritionSourceLabels.push(...nutritionSourceLabels);
+
+    gutTriggerLoad += payloadNum(e.payload, 'gut_trigger_load') ?? 0;
+    gutTriggerBurdenScore += payloadNum(e.payload, 'gut_trigger_burden_score') ?? 0;
+    highFodmapCount += payloadNum(e.payload, 'high_fodmap_food_count') ?? 0;
+    highFodmapBurdenScore += payloadNum(e.payload, 'high_fodmap_burden_score') ?? 0;
+    dairyCount += payloadNum(e.payload, 'dairy_food_count') ?? 0;
+    dairyBurdenScore += payloadNum(e.payload, 'dairy_burden_score') ?? 0;
+    glutenCount += payloadNum(e.payload, 'gluten_food_count') ?? 0;
+    glutenBurdenScore += payloadNum(e.payload, 'gluten_burden_score') ?? 0;
+    artificialSweetenerCount += payloadNum(e.payload, 'artificial_sweetener_food_count') ?? 0;
+    artificialSweetenerBurdenScore +=
+      payloadNum(e.payload, 'artificial_sweetener_burden_score') ?? 0;
+    highFatCount += payloadNum(e.payload, 'high_fat_food_count') ?? 0;
+    highFatBurdenScore += payloadNum(e.payload, 'high_fat_burden_score') ?? 0;
+    spicyCount += payloadNum(e.payload, 'spicy_food_count') ?? 0;
+    spicyBurdenScore += payloadNum(e.payload, 'spicy_burden_score') ?? 0;
+    caffeineFoodCount += payloadNum(e.payload, 'caffeine_food_count') ?? 0;
+    caffeineFoodBurdenScore += payloadNum(e.payload, 'caffeine_food_burden_score') ?? 0;
+    alcoholFoodCount += payloadNum(e.payload, 'alcohol_food_count') ?? 0;
+    alcoholFoodBurdenScore += payloadNum(e.payload, 'alcohol_food_burden_score') ?? 0;
+    fiberDenseCount += payloadNum(e.payload, 'fiber_dense_food_count') ?? 0;
+    fiberDenseBurdenScore += payloadNum(e.payload, 'fiber_dense_burden_score') ?? 0;
+    foodItemCountTotal += payloadNum(e.payload, 'food_item_count_total') ?? 0;
+    structuredFoodItemCount += payloadNum(e.payload, 'structured_food_item_count') ?? 0;
+    structuredIngredientCount += payloadNum(e.payload, 'structured_ingredient_count') ?? 0;
+    caloriesTotal +=
+      payloadNum(e.payload, 'meal_calories_kcal') ?? payloadNum(e.payload, 'calories') ?? 0;
+    proteinTotal += payloadNum(e.payload, 'meal_protein_g') ?? 0;
+    fatTotal += payloadNum(e.payload, 'meal_fat_g') ?? 0;
+    carbsTotal += payloadNum(e.payload, 'meal_carbs_g') ?? 0;
+    fiberTotal += payloadNum(e.payload, 'meal_fiber_g') ?? 0;
+    sugarTotal += payloadNum(e.payload, 'meal_sugar_g') ?? 0;
+    sodiumTotal += payloadNum(e.payload, 'meal_sodium_mg') ?? 0;
+    nutritionCoveredItemCount += payloadNum(e.payload, 'nutrition_covered_item_count') ?? 0;
+    nutritionMissingItemCount += payloadNum(e.payload, 'nutrition_missing_item_count') ?? 0;
+
+    const nutritionConfidence = payloadNum(e.payload, 'nutrition_confidence_avg');
+    if (nutritionConfidence !== null) {
+      nutritionConfidences.push(nutritionConfidence);
+    }
+
+    if (e.local_hour >= 20) lateMeal = true;
+  }
+
+  const nutritionCoverageDenominator =
+    nutritionCoveredItemCount + nutritionMissingItemCount;
+  const structuredCoverageDenominator = foodItemCountTotal;
+  const hasCalories = caloriesTotal > 0;
+
+  return {
+    meal_count: events.length,
+    food_item_names: uniqueSorted(allFoodItemNames),
+    food_tag_set: uniqueSorted(allTags),
+    matched_ingredient_ids: uniqueSorted(allMatchedIngredientIds),
+    matched_food_reference_ids: uniqueSorted(allMatchedFoodReferenceIds),
+    ingredient_signals: uniqueSorted(allIngredientSignals),
+    food_common_gut_effects: uniqueSorted(allCommonGutEffects),
+    gut_trigger_load: gutTriggerLoad,
+    gut_trigger_burden_score: gutTriggerBurdenScore,
+    high_fodmap_food_count: highFodmapCount,
+    high_fodmap_burden_score: highFodmapBurdenScore,
+    dairy_food_count: dairyCount,
+    dairy_burden_score: dairyBurdenScore,
+    gluten_food_count: glutenCount,
+    gluten_burden_score: glutenBurdenScore,
+    artificial_sweetener_food_count: artificialSweetenerCount,
+    artificial_sweetener_burden_score: artificialSweetenerBurdenScore,
+    high_fat_food_count: highFatCount,
+    high_fat_burden_score: highFatBurdenScore,
+    spicy_food_count: spicyCount,
+    spicy_burden_score: spicyBurdenScore,
+    caffeine_food_count: caffeineFoodCount,
+    caffeine_food_burden_score: caffeineFoodBurdenScore,
+    alcohol_food_count: alcoholFoodCount,
+    alcohol_food_burden_score: alcoholFoodBurdenScore,
+    fiber_dense_food_count: fiberDenseCount,
+    fiber_dense_burden_score: fiberDenseBurdenScore,
+    food_item_count_total: foodItemCountTotal,
+    structured_food_item_count: structuredFoodItemCount,
+    structured_ingredient_count: structuredIngredientCount,
+    structured_food_coverage_ratio:
+      structuredCoverageDenominator > 0
+        ? structuredFoodItemCount / structuredCoverageDenominator
+        : null,
+    ingredient_signal_confidence_avg: numericAvg(
+      events
+        .map((event) => payloadNum(event.payload, 'ingredient_signal_confidence_avg'))
+        .filter((value): value is number => value !== null)
+    ),
+    calories_kcal_total: caloriesTotal,
+    protein_g_total: proteinTotal,
+    protein_g_per_1000kcal: hasCalories ? roundTo((proteinTotal / caloriesTotal) * 1000) : null,
+    fat_g_total: fatTotal,
+    fat_calorie_share_ratio: hasCalories ? roundTo((fatTotal * 9) / caloriesTotal) : null,
+    carbs_g_total: carbsTotal,
+    carbs_g_per_1000kcal: hasCalories ? roundTo((carbsTotal / caloriesTotal) * 1000) : null,
+    fiber_g_total: fiberTotal,
+    fiber_g_per_1000kcal: hasCalories ? roundTo((fiberTotal / caloriesTotal) * 1000) : null,
+    sugar_g_total: sugarTotal,
+    sugar_g_per_1000kcal: hasCalories ? roundTo((sugarTotal / caloriesTotal) * 1000) : null,
+    sodium_mg_total: sodiumTotal,
+    sodium_mg_per_1000kcal: hasCalories ? roundTo((sodiumTotal / caloriesTotal) * 1000) : null,
+    nutrition_covered_item_count: nutritionCoveredItemCount,
+    nutrition_missing_item_count: nutritionMissingItemCount,
+    nutrition_coverage_ratio:
+      nutritionCoverageDenominator > 0
+        ? nutritionCoveredItemCount / nutritionCoverageDenominator
+        : null,
+    nutrition_source_labels: uniqueSorted(allNutritionSourceLabels),
+    nutrition_confidence_avg: numericAvg(nutritionConfidences),
+    late_meal: lateMeal,
+  };
+}
+
+function aggregateHydration(events: CanonicalEvent[]) {
+  let effectiveMl = 0;
+  let rawMl = 0;
+  let waterGoalMl = 0;
+  let totalCaffeineMg = 0;
+  let caffeineCount = 0;
+  let alcoholCount = 0;
+
+  for (const e of events) {
+    const ml = payloadNum(e.payload, 'amount_ml') ?? 0;
+    const explicitEffectiveMl = payloadNum(e.payload, 'effective_hydration_ml');
+    const explicitWaterGoalMl = payloadNum(e.payload, 'water_goal_contribution_ml');
+    const explicitCaffeineMg = payloadNum(e.payload, 'caffeine_mg');
+    const beverageType = payloadStr(e.payload, 'beverage_type') ?? '';
+    const beverageCategory = payloadStr(e.payload, 'beverage_category');
+    const alcoholPresent = payloadBool(e.payload, 'alcohol_present');
+    const caffeineContent = payloadBool(e.payload, 'caffeine_content');
+
+    const isAlcohol =
+      alcoholPresent ||
+      beverageCategory === 'alcohol' ||
+      matchesKeywords(beverageType, ALCOHOL_KEYWORDS);
+
+    const isWater = beverageCategory === 'water' || beverageType.toLowerCase() === 'water';
+
+    const isCaffeinated =
+      (explicitCaffeineMg ?? 0) > 0 ||
+      caffeineContent ||
+      beverageCategory === 'coffee' ||
+      beverageCategory === 'tea' ||
+      beverageCategory === 'soda' ||
+      matchesKeywords(beverageType, CAFFEINE_KEYWORDS);
+
+    rawMl += ml;
+    effectiveMl += explicitEffectiveMl ?? (isAlcohol ? 0 : ml);
+    waterGoalMl += explicitWaterGoalMl ?? (isWater ? ml : 0);
+
+    const caffeineMg = explicitCaffeineMg ?? (isCaffeinated ? 25 : 0);
+    totalCaffeineMg += caffeineMg;
+
+    if (isCaffeinated) caffeineCount++;
+    if (isAlcohol) alcoholCount++;
+  }
+
+  return {
+    hydration_total_ml: effectiveMl,
+    hydration_event_count: events.length,
+    hydration_raw_total_ml: rawMl,
+    hydration_water_goal_ml: waterGoalMl,
+    hydration_caffeine_mg: totalCaffeineMg,
+    caffeine_beverage_count: caffeineCount,
+    alcohol_beverage_count: alcoholCount,
+  };
+}
+
+function aggregateSleep(events: CanonicalEvent[]) {
+  const latest = lastEventByOccurredAt(events);
+
+  return {
+    sleep_entry_count: events.length,
+    sleep_duration_minutes: latest ? payloadNum(latest.payload, 'duration_minutes') : null,
+    sleep_quality: latest ? payloadNum(latest.payload, 'quality') : null,
+  };
+}
+
+function aggregateStress(events: CanonicalEvent[]) {
+  const levels: number[] = [];
+
+  for (const e of events) {
+    const lvl = payloadNum(e.payload, 'stress_level');
+    if (lvl !== null) levels.push(lvl);
+  }
+
+  return {
+    stress_event_count: events.length,
+    stress_avg: numericAvg(levels),
+    stress_peak: numericMax(levels),
+  };
+}
+
+function aggregateMedication(events: CanonicalEvent[]) {
+  const names: string[] = [];
+  const matchedMedicationIds: string[] = [];
+  const families: string[] = [];
+  const gutEffects: string[] = [];
+  const routes: string[] = [];
+  const regimenStatuses: string[] = [];
+  const timingContexts: string[] = [];
+  const doseUnits: string[] = [];
+  const exposureProfiles: MedicationExposureProfile[] = [];
+  const structuredMatchConfidenceValues: number[] = [];
+  let structuredMedicationEventCount = 0;
+  let oralMedicationCount = 0;
+  let scheduledMedicationCount = 0;
+  let asNeededMedicationCount = 0;
+  let oneTimeMedicationCount = 0;
+  let offPlanMedicationCount = 0;
+  let withFoodMedicationCount = 0;
+  let beforeMealMedicationCount = 0;
+  let afterMealMedicationCount = 0;
+  let bedtimeMedicationCount = 0;
+  let knownDoseMedicationCount = 0;
+  let giRiskMedicationCount = 0;
+  let motilitySlowingMedicationCount = 0;
+  let motilitySpeedingMedicationCount = 0;
+  let acidSuppressionMedicationCount = 0;
+  let microbiomeDisruptionMedicationCount = 0;
+
+  for (const e of events) {
+    const name = payloadStr(e.payload, 'medication_name');
+    const normalizedMedicationId = payloadStr(e.payload, 'normalized_medication_id');
+    const matchedIds = payloadStrArray(e.payload, 'matched_medication_ids');
+    const medicationFamilies = payloadStrArray(e.payload, 'medication_families');
+    const medicationGutEffects = payloadStrArray(e.payload, 'medication_gut_effects');
+    const route = payloadStr(e.payload, 'route');
+    const regimenStatus = payloadStr(e.payload, 'regimen_status');
+    const timingContext = payloadStr(e.payload, 'timing_context');
+    const doseValue = payloadNum(e.payload, 'dose_value');
+    const doseUnit = payloadStr(e.payload, 'dose_unit');
+    const takenAsPrescribed = payloadOptionalBool(e.payload, 'taken_as_prescribed');
+    const structuredMatch =
+      normalizedMedicationId !== null || matchedIds.length > 0;
+
+    if (name) names.push(name);
+    matchedMedicationIds.push(...matchedIds);
+    families.push(...medicationFamilies);
+    gutEffects.push(...medicationGutEffects);
+    if (route) routes.push(route);
+    if (regimenStatus) regimenStatuses.push(regimenStatus);
+    if (timingContext) timingContexts.push(timingContext);
+    if (doseUnit) doseUnits.push(doseUnit);
+    giRiskMedicationCount += payloadNum(e.payload, 'gi_risk_medication_count') ?? 0;
+    motilitySlowingMedicationCount +=
+      payloadNum(e.payload, 'motility_slowing_medication_count') ?? 0;
+    motilitySpeedingMedicationCount +=
+      payloadNum(e.payload, 'motility_speeding_medication_count') ?? 0;
+    acidSuppressionMedicationCount +=
+      payloadNum(e.payload, 'acid_suppression_medication_count') ?? 0;
+    microbiomeDisruptionMedicationCount +=
+      payloadNum(e.payload, 'microbiome_disruption_medication_count') ?? 0;
+
+    if (structuredMatch) {
+      structuredMedicationEventCount += 1;
+    }
+
+    structuredMatchConfidenceValues.push(structuredMatch ? 0.88 : 0.42);
+
+    if (route === 'oral') oralMedicationCount += 1;
+    if (regimenStatus === 'scheduled') scheduledMedicationCount += 1;
+    if (regimenStatus === 'as_needed') asNeededMedicationCount += 1;
+    if (regimenStatus === 'one_time') oneTimeMedicationCount += 1;
+    if (takenAsPrescribed === false) offPlanMedicationCount += 1;
+    if (timingContext === 'with_food') withFoodMedicationCount += 1;
+    if (timingContext === 'before_meal') beforeMealMedicationCount += 1;
+    if (timingContext === 'after_meal') afterMealMedicationCount += 1;
+    if (timingContext === 'bedtime') bedtimeMedicationCount += 1;
+    if (doseValue !== null) knownDoseMedicationCount += 1;
+
+    exposureProfiles.push({
+      medication_name: name ?? 'Unnamed medication',
+      normalized_medication_id: normalizedMedicationId,
+      matched_medication_ids: matchedIds,
+      medication_families: medicationFamilies,
+      medication_gut_effects: medicationGutEffects,
+      route,
+      regimen_status: regimenStatus,
+      timing_context: timingContext,
+      dose_value: doseValue,
+      dose_unit: doseUnit,
+      taken_as_prescribed: takenAsPrescribed,
+      structured_match: structuredMatch,
+    });
+  }
+
+  return {
+    medication_event_count: events.length,
+    medications_taken: uniqueSorted(names),
+    matched_medication_ids: uniqueSorted(matchedMedicationIds),
+    medication_families: uniqueSorted(families),
+    medication_gut_effects: uniqueSorted(gutEffects),
+    medication_routes: uniqueSorted(routes),
+    medication_regimen_statuses: uniqueSorted(regimenStatuses),
+    medication_timing_contexts: uniqueSorted(timingContexts),
+    medication_dose_units: uniqueSorted(doseUnits),
+    medication_exposure_profiles: exposureProfiles,
+    structured_medication_event_count: structuredMedicationEventCount,
+    structured_medication_coverage_ratio:
+      events.length > 0 ? structuredMedicationEventCount / events.length : null,
+    medication_signal_confidence_avg: numericAvg(structuredMatchConfidenceValues),
+    oral_medication_count: oralMedicationCount,
+    scheduled_medication_count: scheduledMedicationCount,
+    as_needed_medication_count: asNeededMedicationCount,
+    one_time_medication_count: oneTimeMedicationCount,
+    off_plan_medication_count: offPlanMedicationCount,
+    with_food_medication_count: withFoodMedicationCount,
+    before_meal_medication_count: beforeMealMedicationCount,
+    after_meal_medication_count: afterMealMedicationCount,
+    bedtime_medication_count: bedtimeMedicationCount,
+    known_dose_medication_count: knownDoseMedicationCount,
+    gi_risk_medication_count: giRiskMedicationCount,
+    motility_slowing_medication_count: motilitySlowingMedicationCount,
+    motility_speeding_medication_count: motilitySpeedingMedicationCount,
+    acid_suppression_medication_count: acidSuppressionMedicationCount,
+    microbiome_disruption_medication_count: microbiomeDisruptionMedicationCount,
+  };
+}
+
+function aggregateExercise(events: CanonicalEvent[]) {
+  let totalMinutes = 0;
+  let moderateVigorousMinutes = 0;
+
+  for (const e of events) {
+    const dur = payloadNum(e.payload, 'duration_minutes');
+    const intensity = payloadNum(e.payload, 'intensity_level');
+
+    if (dur !== null) {
+      totalMinutes += dur;
+      if (intensity !== null && intensity >= 3) {
+        moderateVigorousMinutes += dur;
+      }
+    }
+  }
+
+  return {
+    exercise_minutes_total: totalMinutes,
+    exercise_sessions_count: events.length,
+    moderate_vigorous_minutes: moderateVigorousMinutes,
+    movement_low_day: totalMinutes < 20,
+  };
+}
+
+function aggregateMenstrualCycle(events: CanonicalEvent[]) {
+  const latest = lastEventByOccurredAt(events);
+
+  return {
+    cycle_entry_count: events.length,
+    cycle_day: latest ? payloadNum(latest.payload, 'cycle_day') : null,
+    cycle_phase: latest ? payloadStr(latest.payload, 'phase') : null,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Coverage / metadata
+// ---------------------------------------------------------------------------
+
+function resolveTimezone(events: CanonicalEvent[]): string | null {
+  const nonNull = events.map((e) => e.timezone).filter((tz): tz is string => tz !== null);
+  if (nonNull.length === 0) return null;
+  const allSame = nonNull.every((tz) => tz === nonNull[0]);
+  if (allSame) return nonNull[0];
+  return nonNull[0];
+}
+
+function computeCompletenessScore(events: CanonicalEvent[]): number | null {
+  const scores = events
+    .map((e) => e.completeness_score)
+    .filter((s): s is number => s !== null);
+  return numericAvg(scores);
+}
+
+// ---------------------------------------------------------------------------
+// Grouping
+// ---------------------------------------------------------------------------
+
+type GroupKey = string;
+
+function makeGroupKey(userId: string, localDate: string): GroupKey {
+  return `${userId}||${localDate}`;
+}
+
+function parseGroupKey(key: GroupKey): { user_id: string; date: string } {
+  const [user_id, date] = key.split('||');
+  return { user_id, date };
+}
+
+export function groupCanonicalEventsByUserAndDate(
+  events: CanonicalEvent[]
+): Map<GroupKey, CanonicalEvent[]> {
+  const groups = new Map<GroupKey, CanonicalEvent[]>();
+  for (const e of events) {
+    const key = makeGroupKey(e.user_id, e.local_date);
+    const list = groups.get(key);
+    if (list) {
+      list.push(e);
+    } else {
+      groups.set(key, [e]);
+    }
+  }
+  return groups;
+}
+
+// ---------------------------------------------------------------------------
+// Core builder
+// ---------------------------------------------------------------------------
+
+function filterByType(events: CanonicalEvent[], type: string): CanonicalEvent[] {
+  return events.filter((e) => e.event_type === type);
+}
+
+export function buildDailyFeaturesForGroup(
+  userId: string,
+  date: string,
+  events: CanonicalEvent[]
+): UserDailyFeatures {
+  const bm = aggregateBM(filterByType(events, 'bm'));
+  const symptom = aggregateSymptoms(filterByType(events, 'symptom'));
+  const food = aggregateFood(filterByType(events, 'food'));
+  const hydration = aggregateHydration(filterByType(events, 'hydration'));
+  const sleep = aggregateSleep(filterByType(events, 'sleep'));
+  const stress = aggregateStress(filterByType(events, 'stress'));
+  const medication = aggregateMedication(filterByType(events, 'medication'));
+  const cycle = aggregateMenstrualCycle(filterByType(events, 'menstrual_cycle'));
+  const exercise = aggregateExercise(filterByType(events, 'exercise'));
+
+  return {
+    user_id: userId,
+    date,
+    event_count: events.length,
+    logging_completeness_score: computeCompletenessScore(events),
+    ...bm,
+    ...symptom,
+    ...food,
+    ...hydration,
+    ...sleep,
+    ...stress,
+    ...medication,
+    ...cycle,
+    ...exercise,
+    timezone: resolveTimezone(events),
+  };
+}
+
+export function buildDailyFeatures(events: CanonicalEvent[]): UserDailyFeatures[] {
+  const groups = groupCanonicalEventsByUserAndDate(events);
+  const results: UserDailyFeatures[] = [];
+
+  for (const [key, groupEvents] of groups) {
+    const { user_id, date } = parseGroupKey(key);
+    results.push(buildDailyFeaturesForGroup(user_id, date, groupEvents));
+  }
+
+  results.sort((a, b) => {
+    const userCmp = a.user_id.localeCompare(b.user_id);
+    if (userCmp !== 0) return userCmp;
+    return a.date.localeCompare(b.date);
+  });
+
+  return results;
+}
+
+// ---------------------------------------------------------------------------
+// Validation / demo helper (developer-safe, no test framework needed)
+// ---------------------------------------------------------------------------
+
+export function dailyFeaturesDemo(): UserDailyFeatures[] {
+  const sampleEvents: CanonicalEvent[] = [
+    {
+      id: 'bm-001',
+      user_id: 'user-abc',
+      event_type: 'bm',
+      occurred_at: '2026-04-08T09:30:00Z',
+      local_date: '2026-04-08',
+      local_hour: 9,
+      timezone: 'America/New_York',
+      source_table: 'bm_logs',
+      payload: {
+        bristol_type: 4,
+        urgency: 2,
+        incomplete_evacuation: false,
+        blood_present: false,
+        mucus_present: false,
+      },
+      completeness_score: 0.9,
+    },
+    {
+      id: 'bm-002',
+      user_id: 'user-abc',
+      event_type: 'bm',
+      occurred_at: '2026-04-08T17:00:00Z',
+      local_date: '2026-04-08',
+      local_hour: 17,
+      timezone: 'America/New_York',
+      source_table: 'bm_logs',
+      payload: {
+        bristol_type: 2,
+        urgency: 5,
+        incomplete_evacuation: true,
+        blood_present: false,
+        mucus_present: true,
+      },
+      completeness_score: 0.85,
+    },
+    {
+      id: 'sym-001',
+      user_id: 'user-abc',
+      event_type: 'symptom',
+      occurred_at: '2026-04-08T10:00:00Z',
+      local_date: '2026-04-08',
+      local_hour: 10,
+      timezone: 'America/New_York',
+      source_table: 'symptom_logs',
+      payload: { symptom_type: 'bloating', severity: 3 },
+      completeness_score: 0.8,
+    },
+    {
+      id: 'sym-002',
+      user_id: 'user-abc',
+      event_type: 'symptom',
+      occurred_at: '2026-04-08T14:00:00Z',
+      local_date: '2026-04-08',
+      local_hour: 14,
+      timezone: 'America/New_York',
+      source_table: 'symptom_logs',
+      payload: { symptom_type: 'cramping', severity: 5 },
+      completeness_score: null,
+    },
+    {
+      id: 'food-001',
+      user_id: 'user-abc',
+      event_type: 'food',
+      occurred_at: '2026-04-08T12:30:00Z',
+      local_date: '2026-04-08',
+      local_hour: 12,
+      timezone: 'America/New_York',
+      source_table: 'food_logs',
+      payload: {
+        meal_type: 'lunch',
+        food_items: ['salad', 'chicken'],
+        food_item_names: ['salad', 'chicken'],
+        matched_ingredient_ids: ['ingredient-fiber'],
+        matched_food_reference_ids: ['food-salad'],
+        tags: ['high-fiber'],
+        ingredient_signals: ['fiber_dense'],
+        common_gut_effects: ['bulk_support'],
+        gut_trigger_load: 1,
+        fiber_dense_food_count: 1,
+        meal_calories_kcal: 320,
+        meal_protein_g: 24,
+        meal_fat_g: 12,
+        meal_carbs_g: 28,
+        meal_fiber_g: 7,
+        meal_sugar_g: 4,
+        meal_sodium_mg: 540,
+        nutrition_covered_item_count: 2,
+        nutrition_missing_item_count: 0,
+        nutrition_source_labels: ['reviewed_reference'],
+        nutrition_confidence_avg: 0.82,
+      },
+      completeness_score: 0.7,
+    },
+    {
+      id: 'food-002',
+      user_id: 'user-abc',
+      event_type: 'food',
+      occurred_at: '2026-04-08T21:00:00Z',
+      local_date: '2026-04-08',
+      local_hour: 21,
+      timezone: 'America/New_York',
+      source_table: 'food_logs',
+      payload: {
+        meal_type: 'dinner',
+        food_items: ['pasta'],
+        food_item_names: ['pasta'],
+        matched_food_reference_ids: ['food-pasta'],
+        tags: ['gluten'],
+        ingredient_signals: ['gluten'],
+        gut_trigger_load: 1,
+        gluten_food_count: 1,
+        meal_calories_kcal: 410,
+        meal_protein_g: 14,
+        meal_fat_g: 11,
+        meal_carbs_g: 63,
+        meal_fiber_g: 3,
+        meal_sugar_g: 6,
+        meal_sodium_mg: 680,
+        nutrition_covered_item_count: 1,
+        nutrition_missing_item_count: 0,
+        nutrition_source_labels: ['reviewed_reference'],
+        nutrition_confidence_avg: 0.78,
+      },
+      completeness_score: 0.6,
+    },
+    {
+      id: 'hyd-001',
+      user_id: 'user-abc',
+      event_type: 'hydration',
+      occurred_at: '2026-04-08T08:00:00Z',
+      local_date: '2026-04-08',
+      local_hour: 8,
+      timezone: 'America/New_York',
+      source_table: 'hydration_logs',
+      payload: {
+        amount_ml: 500,
+        beverage_type: 'water',
+        beverage_category: 'water',
+        effective_hydration_ml: 500,
+        water_goal_contribution_ml: 500,
+        caffeine_mg: 0,
+        alcohol_present: false,
+      },
+      completeness_score: 1.0,
+    },
+    {
+      id: 'hyd-002',
+      user_id: 'user-abc',
+      event_type: 'hydration',
+      occurred_at: '2026-04-08T10:30:00Z',
+      local_date: '2026-04-08',
+      local_hour: 10,
+      timezone: 'America/New_York',
+      source_table: 'hydration_logs',
+      payload: {
+        amount_ml: 350,
+        beverage_type: 'coffee',
+        beverage_category: 'coffee',
+        effective_hydration_ml: 350,
+        water_goal_contribution_ml: 0,
+        caffeine_mg: 95,
+        alcohol_present: false,
+      },
+      completeness_score: 1.0,
+    },
+    {
+      id: 'slp-001',
+      user_id: 'user-abc',
+      event_type: 'sleep',
+      occurred_at: '2026-04-08T07:00:00Z',
+      local_date: '2026-04-08',
+      local_hour: 7,
+      timezone: 'America/New_York',
+      source_table: 'sleep_logs',
+      payload: { duration_minutes: 480, quality: 4 },
+      completeness_score: 0.95,
+    },
+    {
+      id: 'str-001',
+      user_id: 'user-abc',
+      event_type: 'stress',
+      occurred_at: '2026-04-08T14:00:00Z',
+      local_date: '2026-04-08',
+      local_hour: 14,
+      timezone: 'America/New_York',
+      source_table: 'stress_logs',
+      payload: { stress_level: 6 },
+      completeness_score: 0.8,
+    },
+    {
+      id: 'med-001',
+      user_id: 'user-abc',
+      event_type: 'medication',
+      occurred_at: '2026-04-08T08:15:00Z',
+      local_date: '2026-04-08',
+      local_hour: 8,
+      timezone: 'America/New_York',
+      source_table: 'medication_logs',
+      payload: {
+        medication_name: 'Ferrous Sulfate',
+        normalized_medication_id: 'med-iron-001',
+        matched_medication_ids: ['iron'],
+        medication_families: ['iron'],
+        medication_gut_effects: ['motility_slowing', 'constipation_risk', 'nausea_risk'],
+        route: 'oral',
+        regimen_status: 'scheduled',
+        timing_context: 'before_meal',
+        dose_value: 65,
+        dose_unit: 'mg',
+        taken_as_prescribed: true,
+        gi_risk_medication_count: 1,
+        motility_slowing_medication_count: 1,
+      },
+      completeness_score: 1.0,
+    },
+    {
+      id: 'mc-001',
+      user_id: 'user-abc',
+      event_type: 'menstrual_cycle',
+      occurred_at: '2026-04-08T09:00:00Z',
+      local_date: '2026-04-08',
+      local_hour: 9,
+      timezone: 'America/New_York',
+      source_table: 'menstrual_cycle_logs',
+      payload: { cycle_day: 4, flow_intensity: 'medium' },
+      completeness_score: 0.9,
+    },
+  ];
+
+  return buildDailyFeatures(sampleEvents);
+}
