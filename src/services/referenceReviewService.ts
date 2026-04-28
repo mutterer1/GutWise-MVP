@@ -5,6 +5,10 @@ import {
 import { supabase } from '../lib/supabase';
 import { fetchFoodEnrichment } from './foodEnrichmentService';
 import { fetchMedicationEnrichment } from './medicationEnrichmentService';
+import {
+  ingestFoodSourceRecords,
+  ingestMedicationSourceRecords,
+} from './sourceIngestionService';
 import type {
   FoodReferenceCandidateDetail,
   FoodReferenceCandidateIngredient,
@@ -22,6 +26,10 @@ import type {
   ReferenceCandidateReviewStatus,
   ReferenceReviewCandidateRow,
 } from '../types/intelligence';
+import type {
+  FoodSourceRecordRow,
+  MedicationSourceRecordRow,
+} from '../types/referenceEvidence';
 
 interface QueueFoodReferenceCandidateInput {
   userId: string;
@@ -97,6 +105,140 @@ function cleanOptionalConfidence(value: unknown): number | null {
 
 function dedupeStrings(values: string[]): string[] {
   return [...new Set(values.map((value) => value.trim()).filter(Boolean))];
+}
+
+function parseStrengthDoseUnits(strengthLabel: string | null): string[] {
+  if (!strengthLabel) return [];
+  const matches = strengthLabel.match(/\b(mg|mcg|g|ml|unit|unt|meq|%)\b/gi) ?? [];
+  return dedupeStrings(matches.map((match) => match.toLowerCase()));
+}
+
+function buildFoodDetailFromSourceRecord(
+  existing: FoodReferenceCandidateDetail,
+  record: FoodSourceRecordRow
+): FoodReferenceCandidateDetail {
+  const suggestedIngredients = buildFallbackFoodCandidateIngredients(
+    record.ingredient_names,
+    record.match_confidence
+  );
+
+  return {
+    ...existing,
+    suggested_food_category: record.food_category,
+    suggested_brand_name: record.brand_name,
+    suggested_common_aliases: dedupeStrings([
+      ...existing.suggested_common_aliases,
+      record.display_name,
+      record.canonical_name,
+    ]),
+    suggested_serving_label: record.serving_label ?? existing.portion_size,
+    suggested_calories_kcal: record.calories_kcal ?? existing.estimated_calories,
+    suggested_protein_g: record.protein_g ?? existing.suggested_protein_g,
+    suggested_fat_g: record.fat_g ?? existing.suggested_fat_g,
+    suggested_carbs_g: record.carbs_g ?? existing.suggested_carbs_g,
+    suggested_fiber_g: record.fiber_g ?? existing.suggested_fiber_g,
+    suggested_sugar_g: record.sugar_g ?? existing.suggested_sugar_g,
+    suggested_sodium_mg: record.sodium_mg ?? existing.suggested_sodium_mg,
+    suggested_ingredient_names: suggestedIngredients.map((ingredient) => ingredient.name),
+    suggested_ingredients: suggestedIngredients,
+    suggested_default_signals: dedupeStrings([
+      ...existing.suggested_default_signals,
+      ...record.default_signals,
+    ]),
+    enrichment_source_label: 'USDA FoodData Central',
+    enrichment_source_ref: record.provider_food_id ? `fdc:${record.provider_food_id}` : record.id,
+    enrichment_confidence: record.match_confidence ?? 0.82,
+    enrichment_status: 'enriched',
+    enrichment_last_attempt_at: record.retrieved_at,
+    enrichment_notes:
+      'Matched to a cached USDA FoodData Central source record. Review serving, ingredient signals, and nutrition before promotion.',
+  };
+}
+
+function buildMedicationDetailFromSourceRecords(
+  existing: MedicationReferenceCandidateDetail,
+  rxnormRecord: MedicationSourceRecordRow | null,
+  dailymedRecord: MedicationSourceRecordRow | null
+): MedicationReferenceCandidateDetail {
+  const primary = rxnormRecord ?? dailymedRecord;
+  const route = rxnormRecord?.route ?? dailymedRecord?.route ?? existing.route;
+  const dosageForm = rxnormRecord?.dosage_form ?? dailymedRecord?.dosage_form;
+  const strengthLabel = rxnormRecord?.strength_label ?? dailymedRecord?.strength_label;
+  const sourceRefs = dedupeStrings([
+    rxnormRecord?.rxnorm_code ? `rxnorm:${rxnormRecord.rxnorm_code}` : '',
+    dailymedRecord?.set_id ? `dailymed:${dailymedRecord.set_id}` : '',
+  ]);
+
+  return {
+    ...existing,
+    suggested_generic_name:
+      rxnormRecord?.generic_name ??
+      dailymedRecord?.generic_name ??
+      existing.suggested_generic_name,
+    suggested_brand_names: dedupeStrings([
+      ...existing.suggested_brand_names,
+      ...(rxnormRecord?.brand_names ?? []),
+      ...(dailymedRecord?.brand_names ?? []),
+    ]),
+    suggested_medication_class:
+      rxnormRecord?.medication_class ??
+      dailymedRecord?.medication_class ??
+      existing.suggested_medication_class,
+    suggested_medication_family:
+      rxnormRecord?.medication_family ??
+      dailymedRecord?.medication_family ??
+      existing.suggested_medication_family,
+    suggested_rxnorm_code:
+      rxnormRecord?.rxnorm_code ??
+      dailymedRecord?.rxnorm_code ??
+      existing.suggested_rxnorm_code,
+    suggested_gut_relevance:
+      dailymedRecord?.gut_relevance ??
+      rxnormRecord?.gut_relevance ??
+      existing.suggested_gut_relevance,
+    suggested_common_gut_effects: dedupeStrings([
+      ...existing.suggested_common_gut_effects,
+      ...(rxnormRecord?.common_gut_effects ?? []),
+      ...(dailymedRecord?.common_gut_effects ?? []),
+    ]),
+    suggested_interaction_flags: dedupeStrings([
+      ...existing.suggested_interaction_flags,
+      ...(rxnormRecord?.interaction_flags ?? []),
+      ...(dailymedRecord?.interaction_flags ?? []),
+    ]),
+    suggested_active_ingredients: dedupeStrings([
+      ...existing.suggested_active_ingredients,
+      ...(rxnormRecord?.active_ingredients ?? []),
+      ...(dailymedRecord?.active_ingredients ?? []),
+    ]),
+    suggested_common_dose_units: dedupeStrings([
+      ...existing.suggested_common_dose_units,
+      ...parseStrengthDoseUnits(strengthLabel ?? null),
+    ]),
+    suggested_dosage_form: dosageForm ?? existing.suggested_dosage_form,
+    suggested_route: route,
+    enrichment_source_label:
+      dailymedRecord !== null ? 'RxNorm / DailyMed' : primary !== null ? 'RxNorm' : null,
+    enrichment_source_ref: sourceRefs.join('; ') || primary?.id || null,
+    enrichment_confidence:
+      Math.max(
+        rxnormRecord?.match_confidence ?? 0,
+        dailymedRecord?.match_confidence ?? 0,
+        existing.enrichment_confidence ?? 0
+      ) || null,
+    enrichment_status: primary ? 'enriched' : existing.enrichment_status,
+    enrichment_last_attempt_at:
+      dailymedRecord?.retrieved_at ?? rxnormRecord?.retrieved_at ?? existing.enrichment_last_attempt_at,
+    enrichment_notes: primary
+      ? [
+          'Matched to cached medication source records.',
+          dailymedRecord?.adverse_reactions.length
+            ? `DailyMed gut-relevant label terms: ${dailymedRecord.adverse_reactions.join(', ')}.`
+            : '',
+          'Review generic, dose form, route, and adverse-reaction relevance before promotion.',
+        ].filter(Boolean).join(' ')
+      : existing.enrichment_notes,
+  };
 }
 
 function buildFoodCandidateIngredient(params: {
@@ -1665,6 +1807,21 @@ export async function refreshFoodReferenceCandidateEnrichment(
   }
 
   const existingDetail = readFoodCandidateDetail(candidate.detail);
+  let usdaDetail: FoodReferenceCandidateDetail | null = null;
+
+  try {
+    const usdaResult = await ingestFoodSourceRecords({
+      query: candidate.display_name,
+      pageSize: 5,
+    });
+    const sourceRecord = usdaResult.records[0] ?? null;
+    if (sourceRecord) {
+      usdaDetail = buildFoodDetailFromSourceRecord(existingDetail, sourceRecord);
+    }
+  } catch {
+    usdaDetail = null;
+  }
+
   const enriched = await fetchFoodEnrichment({
     displayName: candidate.display_name,
     observedTags: existingDetail.tags,
@@ -1673,7 +1830,7 @@ export async function refreshFoodReferenceCandidateEnrichment(
     forceRefresh: true,
   });
 
-  const enrichedDetail = applyFoodEnrichmentResult(existingDetail, {
+  const fallbackDetail = applyFoodEnrichmentResult(existingDetail, {
     ...existingDetail,
     suggested_food_category: enriched.suggestedFoodCategory,
     suggested_brand_name: enriched.suggestedBrandName,
@@ -1699,6 +1856,8 @@ export async function refreshFoodReferenceCandidateEnrichment(
     enrichment_last_attempt_at: enriched.enrichmentLastAttemptAt,
     enrichment_notes: enriched.enrichmentNotes,
   });
+
+  const enrichedDetail = usdaDetail ?? fallbackDetail;
 
   const { data, error } = await supabase
     .from('reference_review_candidates')
@@ -1754,6 +1913,28 @@ export async function refreshMedicationReferenceCandidateEnrichment(
   }
 
   const existingDetail = readMedicationCandidateDetail(candidate.detail);
+  let sourceBackedDetail: MedicationReferenceCandidateDetail | null = null;
+
+  try {
+    const sourceResult = await ingestMedicationSourceRecords({
+      name: candidate.display_name,
+      pageSize: 5,
+      includeDailyMed: true,
+    });
+    const rxnormRecord = sourceResult.rxnorm_records[0] ?? null;
+    const dailymedRecord = sourceResult.dailymed_records[0] ?? null;
+
+    if (rxnormRecord || dailymedRecord) {
+      sourceBackedDetail = buildMedicationDetailFromSourceRecords(
+        existingDetail,
+        rxnormRecord,
+        dailymedRecord
+      );
+    }
+  } catch {
+    sourceBackedDetail = null;
+  }
+
   const enriched = await fetchMedicationEnrichment({
     displayName: candidate.display_name,
     observedMedicationType: existingDetail.medication_type,
@@ -1763,7 +1944,7 @@ export async function refreshMedicationReferenceCandidateEnrichment(
     forceRefresh: true,
   });
 
-  const enrichedDetail = applyMedicationEnrichmentResult(existingDetail, {
+  const fallbackDetail = applyMedicationEnrichmentResult(existingDetail, {
     ...existingDetail,
     suggested_generic_name: enriched.suggestedGenericName,
     suggested_brand_names: enriched.suggestedBrandNames,
@@ -1784,6 +1965,8 @@ export async function refreshMedicationReferenceCandidateEnrichment(
     enrichment_last_attempt_at: enriched.enrichmentLastAttemptAt,
     enrichment_notes: enriched.enrichmentNotes,
   });
+
+  const enrichedDetail = sourceBackedDetail ?? fallbackDetail;
 
   const { data, error } = await supabase
     .from('reference_review_candidates')
