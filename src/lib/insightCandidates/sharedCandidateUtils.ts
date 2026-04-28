@@ -69,7 +69,8 @@ export function computeRecencyWeight(
 ): number | null {
   if (sampleDates.length === 0) return null;
 
-  const latestSample = [...sampleDates].sort().at(-1);
+  const sortedSampleDates = [...sampleDates].sort();
+  const latestSample = sortedSampleDates[sortedSampleDates.length - 1];
   if (!latestSample) return null;
 
   const daysSinceLatest = Math.max(

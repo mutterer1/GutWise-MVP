@@ -5,58 +5,13 @@ import {
   compactCandidates,
   sortCandidatesForDebug,
 } from './runCoreCandidateAnalyzers';
+import { createDemoDailyFeature } from './demoDailyFeatureDefaults';
 
 function makeDay(
   date: string,
   overrides: Partial<UserDailyFeatures>
 ): UserDailyFeatures {
-  return {
-    user_id: 'demo-user',
-    date,
-    event_count: 5,
-    logging_completeness_score: 0.8,
-    bm_count: 1,
-    avg_bristol: 4,
-    hard_stool_count: 0,
-    loose_stool_count: 0,
-    urgency_event_count: 0,
-    incomplete_evacuation_count: 0,
-    blood_present_count: 0,
-    mucus_present_count: 0,
-    first_bm_hour: 8,
-    last_bm_hour: 8,
-    symptom_event_count: 1,
-    symptom_burden_score: 3,
-    max_symptom_severity: 2,
-    symptom_types: ['bloating'],
-    meal_count: 3,
-    food_tag_set: [],
-    late_meal: false,
-    hydration_total_ml: 2000,
-    hydration_event_count: 4,
-    hydration_raw_total_ml: 2300,
-    hydration_water_goal_ml: 1600,
-    hydration_caffeine_mg: 95,
-    caffeine_beverage_count: 1,
-    alcohol_beverage_count: 0,
-    sleep_entry_count: 1,
-    sleep_duration_minutes: 420,
-    sleep_quality: 4,
-    stress_event_count: 1,
-    stress_avg: 3,
-    stress_peak: 4,
-    medication_event_count: 0,
-    medications_taken: [],
-    cycle_entry_count: 0,
-    cycle_day: null,
-    cycle_phase: null,
-    exercise_minutes_total: 0,
-    exercise_sessions_count: 0,
-    moderate_vigorous_minutes: 0,
-    movement_low_day: false,
-    timezone: 'America/New_York',
-    ...overrides,
-  };
+  return createDemoDailyFeature(date, overrides);
 }
 
 function makeDemoBaselines(): UserBaselineSet {

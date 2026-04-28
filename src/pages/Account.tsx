@@ -4,7 +4,6 @@ import {
   ArrowLeft,
   User,
   Mail,
-  Calendar,
   LogOut,
   Save,
   Ruler,

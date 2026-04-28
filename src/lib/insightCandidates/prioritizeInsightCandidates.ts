@@ -213,7 +213,8 @@ function isUsableCandidate(c: InsightCandidate): boolean {
 function getMostRecentSampleDate(candidate: InsightCandidate): string {
   const sampleDates = candidate.evidence.sample_dates ?? [];
   if (sampleDates.length === 0) return '';
-  return [...sampleDates].sort().at(-1) ?? '';
+  const sortedSampleDates = [...sampleDates].sort();
+  return sortedSampleDates[sortedSampleDates.length - 1] ?? '';
 }
 
 export function prioritizeInsightCandidates(

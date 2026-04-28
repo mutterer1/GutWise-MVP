@@ -52,7 +52,9 @@ export interface UseRankedInsightsOptions {
   enabled?: boolean;
 }
 
-function hasAnyMedicalContext(summary: Awaited<ReturnType<typeof fetchMedicalContextSummary>>): boolean {
+function hasAnyMedicalContext(
+  summary: Awaited<ReturnType<typeof fetchMedicalContextSummary>> | null
+): boolean {
   return summary !== null && (
     summary.active_diagnoses.length > 0 ||
     summary.suspected_conditions.length > 0 ||

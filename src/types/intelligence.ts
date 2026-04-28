@@ -8,6 +8,10 @@ export interface IngredientReferenceItemRow {
   fodmap_level: IngredientFodmapLevel | null;
   common_aliases: string[];
   default_signals: string[];
+  primary_source_id: string | null;
+  primary_source_version_id: string | null;
+  evidence_review_status: string;
+  source_last_verified_at: string | null;
   typical_gut_reactions: string[];
   evidence_notes: string | null;
   created_at: string;
@@ -35,6 +39,10 @@ export interface FoodReferenceItemRow {
   nutrition_source_ref: string | null;
   common_aliases: string[];
   default_signals: string[];
+  primary_source_id: string | null;
+  primary_source_version_id: string | null;
+  evidence_review_status: string;
+  source_last_verified_at: string | null;
   source_label: string;
   evidence_notes: string | null;
   created_at: string;
@@ -156,6 +164,10 @@ export interface MedicationReferenceItemRow {
   source_label: string | null;
   source_ref: string | null;
   source_confidence: number | null;
+  primary_source_id: string | null;
+  primary_source_version_id: string | null;
+  evidence_review_status: string;
+  source_last_verified_at: string | null;
   evidence_notes: string | null;
   created_at: string;
   updated_at: string;

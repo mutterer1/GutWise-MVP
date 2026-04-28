@@ -22,10 +22,6 @@ export interface DerivedMedicationIntelligence {
   common_gut_effects: string[];
 }
 
-function normalize(value: string): string {
-  return value.trim().toLowerCase();
-}
-
 function unique(values: string[]): string[] {
   return [...new Set(values)].sort();
 }

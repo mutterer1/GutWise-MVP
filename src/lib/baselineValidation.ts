@@ -1,55 +1,22 @@
 import type { UserDailyFeatures } from '../types/dailyFeatures';
 import type { UserBaselineSet } from '../types/baselines';
 import { computeUserBaselines, computeUserBaselinesForWindow } from './baselines';
+import { createDemoDailyFeature } from './insightCandidates/demoDailyFeatureDefaults';
 
 function makeSampleDay(overrides: Partial<UserDailyFeatures> & { date: string }): UserDailyFeatures {
-  return {
-    user_id: 'demo-user',
-    date: overrides.date,
+  return createDemoDailyFeature(overrides.date, {
     event_count: 8,
     logging_completeness_score: 0.85,
-    bm_count: 2,
-    avg_bristol: 4,
-    hard_stool_count: 0,
-    loose_stool_count: 0,
-    urgency_event_count: 0,
-    incomplete_evacuation_count: 0,
-    blood_present_count: 0,
-    mucus_present_count: 0,
-    first_bm_hour: 8,
     last_bm_hour: 17,
-    symptom_event_count: 1,
-    symptom_burden_score: 3,
-    max_symptom_severity: 3,
-    symptom_types: ['bloating'],
-    meal_count: 3,
-    food_tag_set: ['fiber'],
-    late_meal: false,
-    hydration_total_ml: 2000,
     hydration_event_count: 6,
-    hydration_raw_total_ml: 2300,
-    hydration_water_goal_ml: 1600,
-    hydration_caffeine_mg: 95,
-    caffeine_beverage_count: 1,
-    alcohol_beverage_count: 0,
-    sleep_entry_count: 1,
-    sleep_duration_minutes: 420,
-    sleep_quality: 4,
-    stress_event_count: 1,
     stress_avg: 4,
     stress_peak: 5,
     medication_event_count: 1,
     medications_taken: ['Probiotic'],
-    cycle_entry_count: 0,
-    cycle_day: null,
-    cycle_phase: null,
-    exercise_minutes_total: 0,
-    exercise_sessions_count: 0,
-    moderate_vigorous_minutes: 0,
-    movement_low_day: false,
-    timezone: 'America/New_York',
+    medication_families: ['probiotic'],
+    medication_gut_effects: [],
     ...overrides,
-  };
+  });
 }
 
 export function baselineValidationDemo(): {

@@ -258,7 +258,7 @@ function formatIngredientSuggestionSummary(
 }
 
 export function readFoodCandidateDetail(
-  detail: Record<string, unknown>
+  detail: Record<string, unknown> | FoodReferenceCandidateDetail
 ): FoodReferenceCandidateDetail {
   const suggestedIngredientNames = Array.isArray(detail.suggested_ingredient_names)
     ? dedupeStrings(
@@ -405,7 +405,7 @@ function parseMedicationEnrichmentStatus(
 }
 
 export function readMedicationCandidateDetail(
-  detail: Record<string, unknown>
+  detail: Record<string, unknown> | MedicationReferenceCandidateDetail
 ): MedicationReferenceCandidateDetail {
   return {
     dosage: cleanOptionalText(typeof detail.dosage === 'string' ? detail.dosage : null),
@@ -1885,6 +1885,27 @@ async function markCandidateReviewed(params: {
   if (error) throw error;
 }
 
+let userReviewSourceIdCache: string | null | undefined;
+
+async function fetchUserReviewSourceId(): Promise<string | null> {
+  if (userReviewSourceIdCache !== undefined) {
+    return userReviewSourceIdCache;
+  }
+
+  const { data, error } = await supabase
+    .from('reference_sources')
+    .select('id')
+    .eq('provider_key', 'gutwise_user_review')
+    .maybeSingle();
+
+  if (error) throw error;
+
+  userReviewSourceIdCache =
+    data && typeof data.id === 'string' ? data.id : null;
+
+  return userReviewSourceIdCache;
+}
+
 async function promoteFoodCandidate(
   userId: string,
   candidate: ReferenceReviewCandidateRow
@@ -1921,6 +1942,8 @@ async function promoteFoodCandidate(
 
   const detail = readFoodCandidateDetail(candidate.detail);
   const canonicalName = normalizeLookupKey(candidate.display_name);
+  const promotedAt = new Date().toISOString();
+  const userReviewSourceId = await fetchUserReviewSourceId();
 
   const { data, error } = await supabase
     .from('food_reference_items')
@@ -1948,6 +1971,10 @@ async function promoteFoodCandidate(
           ? detail.suggested_default_signals
           : deriveFoodSignalsFromTags(detail.tags),
       source_label: 'user_review',
+      primary_source_id: userReviewSourceId,
+      primary_source_version_id: null,
+      evidence_review_status: 'review_ready',
+      source_last_verified_at: promotedAt,
       evidence_notes: buildFoodEvidenceNotes(detail),
     })
     .select('*')
@@ -2020,6 +2047,9 @@ async function promoteMedicationCandidate(
     };
   }
 
+  const promotedAt = new Date().toISOString();
+  const userReviewSourceId = await fetchUserReviewSourceId();
+
   const { data, error } = await supabase
     .from('medication_reference_items')
     .insert({
@@ -2048,6 +2078,10 @@ async function promoteMedicationCandidate(
       source_label: detail.enrichment_source_label ?? 'user_review',
       source_ref: detail.enrichment_source_ref,
       source_confidence: detail.enrichment_confidence,
+      primary_source_id: userReviewSourceId,
+      primary_source_version_id: null,
+      evidence_review_status: 'review_ready',
+      source_last_verified_at: promotedAt,
       evidence_notes: buildMedicationEvidenceNotes(detail),
     })
     .select('*')

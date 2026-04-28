@@ -54,7 +54,7 @@ export interface RawDashboardQueryResults {
 const MEAL_TYPES = new Set(['breakfast', 'lunch', 'dinner']);
 
 function sumNullable(values: Array<number | null | undefined>): number {
-  return values.reduce((sum, value) => sum + (value ?? 0), 0);
+  return values.reduce<number>((sum, value) => sum + (value ?? 0), 0);
 }
 
 export function calculateAverageBristol(logs: BMLogRow[]): number | null {

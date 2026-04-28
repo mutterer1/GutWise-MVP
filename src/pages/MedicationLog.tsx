@@ -747,7 +747,7 @@ function OptionGrid({
 }: {
   label: string;
   description: string;
-  options: Array<{ value: string; label: string }>;
+  options: ReadonlyArray<{ value: string; label: string }>;
   value: string;
   onSelect: (value: string) => void;
 }) {
