@@ -10,7 +10,7 @@ export const TREND_CHART_COLORS = {
   warning: '#f6a81c',
   danger: '#fb718d',
   amber: '#fac24a',
-  grid: 'rgba(202, 190, 255, 0.13)',
+  grid: 'rgba(202, 190, 255, 0.07)',
   axis: 'rgba(216, 213, 232, 0.5)',
   muted: 'rgba(216, 213, 232, 0.64)',
 };
