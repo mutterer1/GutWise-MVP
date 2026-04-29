@@ -28,6 +28,7 @@ import { analyzeFoodGutTriggerLoadSameDaySymptomBurdenCandidate } from './foodGu
 import { analyzeFoodLowFiberNextDayHardStoolCandidate } from './foodLowFiberNextDayHardStoolCandidate';
 import { analyzeFoodHighFatSameDaySymptomBurdenCandidate } from './foodHighFatSameDaySymptomBurdenCandidate';
 import { analyzeFoodHighSugarSameDaySymptomBurdenCandidate } from './foodHighSugarSameDaySymptomBurdenCandidate';
+import { analyzeAbsenceRiskPatternCandidate } from './absenceRiskPatternCandidate';
 
 type CandidateAnalyzer = (
   features: UserDailyFeatures[],
@@ -35,6 +36,7 @@ type CandidateAnalyzer = (
 ) => InsightCandidate | null;
 
 const CORE_ANALYZERS: CandidateAnalyzer[] = [
+  analyzeAbsenceRiskPatternCandidate,
   analyzeSleepSymptomCandidate,
   analyzeStressUrgencyCandidate,
   analyzeHydrationStoolConsistencyCandidate,

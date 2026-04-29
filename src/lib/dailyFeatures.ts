@@ -591,6 +591,28 @@ function aggregateMenstrualCycle(events: CanonicalEvent[]) {
   };
 }
 
+function aggregateAbsenceConfirmations(events: CanonicalEvent[]) {
+  const absenceTypes = uniqueSorted(
+    events
+      .map((event) => payloadStr(event.payload, 'absence_type'))
+      .filter((value): value is string => value !== null)
+  );
+  const has = (absenceType: string) => absenceTypes.includes(absenceType);
+
+  return {
+    absence_confirmation_count: events.length,
+    absence_confirmations: absenceTypes,
+    no_symptoms_confirmed: has('symptoms'),
+    no_stress_confirmed: has('stress'),
+    no_pain_confirmed: has('pain'),
+    no_exercise_confirmed: has('exercise'),
+    no_hydration_confirmed: has('hydration'),
+    no_bowel_movement_confirmed: has('bowel_movement'),
+    no_sleep_confirmed: has('sleep'),
+    no_medication_confirmed: has('medication'),
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Coverage / metadata
 // ---------------------------------------------------------------------------
@@ -663,6 +685,11 @@ export function buildDailyFeaturesForGroup(
   const medication = aggregateMedication(filterByType(events, 'medication'));
   const cycle = aggregateMenstrualCycle(filterByType(events, 'menstrual_cycle'));
   const exercise = aggregateExercise(filterByType(events, 'exercise'));
+  const absence = aggregateAbsenceConfirmations(filterByType(events, 'absence_confirmation'));
+  const hasActualHydration = hydration.hydration_event_count > 0;
+  const hasActualSleep = sleep.sleep_entry_count > 0;
+  const hasActualStress = stress.stress_event_count > 0;
+  const hasActualSymptoms = symptom.symptom_event_count > 0;
 
   return {
     user_id: userId,
@@ -678,6 +705,31 @@ export function buildDailyFeaturesForGroup(
     ...medication,
     ...cycle,
     ...exercise,
+    ...absence,
+    hydration_total_ml:
+      absence.no_hydration_confirmed && !hasActualHydration ? 0 : hydration.hydration_total_ml,
+    hydration_event_count:
+      absence.no_hydration_confirmed ? Math.max(hydration.hydration_event_count, 1) : hydration.hydration_event_count,
+    hydration_raw_total_ml:
+      absence.no_hydration_confirmed && !hasActualHydration ? 0 : hydration.hydration_raw_total_ml,
+    hydration_water_goal_ml:
+      absence.no_hydration_confirmed && !hasActualHydration ? 0 : hydration.hydration_water_goal_ml,
+    sleep_entry_count:
+      absence.no_sleep_confirmed ? Math.max(sleep.sleep_entry_count, 1) : sleep.sleep_entry_count,
+    sleep_duration_minutes:
+      absence.no_sleep_confirmed && !hasActualSleep ? 0 : sleep.sleep_duration_minutes,
+    stress_event_count:
+      absence.no_stress_confirmed ? Math.max(stress.stress_event_count, 1) : stress.stress_event_count,
+    stress_avg: absence.no_stress_confirmed && !hasActualStress ? 0 : stress.stress_avg,
+    stress_peak: absence.no_stress_confirmed && !hasActualStress ? 0 : stress.stress_peak,
+    symptom_burden_score:
+      absence.no_symptoms_confirmed && !hasActualSymptoms ? 0 : symptom.symptom_burden_score,
+    max_symptom_severity:
+      absence.no_symptoms_confirmed && !hasActualSymptoms ? 0 : symptom.max_symptom_severity,
+    movement_low_day:
+      absence.no_exercise_confirmed && exercise.exercise_sessions_count === 0
+        ? true
+        : exercise.movement_low_day,
     timezone: resolveTimezone(events),
   };
 }

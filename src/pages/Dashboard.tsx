@@ -300,8 +300,28 @@ export default function Dashboard() {
                   </div>
 
                   <div className="max-w-4xl">
-                    <h1 className="page-title text-[clamp(2.8rem,6vw,5.9rem)]">
-                      Your health intelligence cockpit.
+                    <h1
+                      className="page-title text-[clamp(2.8rem,6vw,5.9rem)]"
+                      aria-label="Your health intelligence hub."
+                    >
+                      <span aria-hidden="true" className="block">
+                        Your health
+                      </span>
+                      <span
+                        aria-hidden="true"
+                        className="inline-flex items-baseline whitespace-nowrap"
+                      >
+                        <span>intelli</span>
+                        <img
+                          src="/logos/gutwise-icon-dark.svg"
+                          alt=""
+                          className="ml-[0.014em] mr-[0.014em] inline-block h-[0.60em] w-[0.60em] -translate-y-[0.005em] object-contain"
+                        />
+                        <span>ence</span>
+                      </span>
+                      <span aria-hidden="true" className="block">
+                        hub.
+                      </span>
                     </h1>
                     <p className="page-subtitle mt-4 max-w-3xl text-[clamp(1rem,1.4vw,1.25rem)]">
                       GutWise is mapping today&apos;s bowel, food, hydration, symptom, sleep, stress,

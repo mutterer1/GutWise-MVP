@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
+  Ban,
   CheckCircle2,
   Circle,
   ClipboardCheck,
@@ -26,6 +27,14 @@ import { supabase } from '../lib/supabase';
 import type { DailyCheckInDraft } from '../types/dailyCheckIn';
 import { BEVERAGE_TYPES } from '../constants/domain';
 import { hydrateLogWithDerivedFields } from '../utils/hydrationClassification';
+import {
+  fetchDailyAbsenceConfirmations,
+  upsertDailyAbsenceConfirmations,
+} from '../services/dailyAbsenceConfirmationService';
+import type {
+  AbsenceType,
+  DailyAbsenceConfirmationRow,
+} from '../types/absenceConfirmations';
 
 type SectionKey =
   | 'bowelMovement'
@@ -53,6 +62,21 @@ const sectionMeta: Array<{
   { key: 'exercise', label: 'Exercise', icon: Dumbbell, description: 'Movement can add useful context.' },
   { key: 'medication', label: 'Medication', icon: Pill, description: 'Keep timing and dose in one place.' },
   { key: 'menstrualCycle', label: 'Cycle', icon: Heart, description: 'Optional context when it is relevant for you.' },
+];
+
+const absenceMeta: Array<{
+  type: AbsenceType;
+  label: string;
+  description: string;
+}> = [
+  { type: 'symptoms', label: 'No symptoms', description: 'Symptom burden counts as 0.' },
+  { type: 'stress', label: 'No stress', description: 'Stress counts as 0.' },
+  { type: 'pain', label: 'No pain', description: 'Pain context counts as 0.' },
+  { type: 'exercise', label: 'No exercise', description: 'Movement context counts as none.' },
+  { type: 'hydration', label: 'No hydration', description: 'Fluid intake counts as 0 mL.' },
+  { type: 'bowel_movement', label: 'No stool', description: 'No bowel movement is counted.' },
+  { type: 'sleep', label: 'No sleep', description: 'Sleep duration counts as 0 hours.' },
+  { type: 'medication', label: 'No medication', description: 'No medication taken is counted.' },
 ];
 
 function splitTags(value: string): string[] {
@@ -85,6 +109,9 @@ export default function DailyCheckIn() {
   const { draft, updateDraft, resetDraft } = useDailyCheckInDraft(user?.id);
   const [savingAll, setSavingAll] = useState(false);
   const [savingSection, setSavingSection] = useState<SectionKey | null>(null);
+  const [savingAbsences, setSavingAbsences] = useState(false);
+  const [selectedAbsences, setSelectedAbsences] = useState<AbsenceType[]>([]);
+  const [absenceHistory, setAbsenceHistory] = useState<DailyAbsenceConfirmationRow[]>([]);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -126,6 +153,64 @@ export default function DailyCheckIn() {
       }
     }).length;
   }, [draft]);
+
+  const absenceDate = useMemo(() => draft.logged_at.slice(0, 10), [draft.logged_at]);
+  const todaysAbsences = useMemo(
+    () => absenceHistory.filter((item) => item.absence_date === absenceDate),
+    [absenceDate, absenceHistory]
+  );
+
+  const refreshAbsenceHistory = useCallback(async () => {
+    if (!user?.id) {
+      setAbsenceHistory([]);
+      return;
+    }
+
+    const rows = await fetchDailyAbsenceConfirmations(user.id, { limit: 24 });
+    setAbsenceHistory(rows);
+  }, [user?.id]);
+
+  useEffect(() => {
+    refreshAbsenceHistory().catch((err) => {
+      console.error('Error loading none confirmations:', err);
+    });
+  }, [refreshAbsenceHistory]);
+
+  const toggleAbsence = (type: AbsenceType) => {
+    setSelectedAbsences((current) =>
+      current.includes(type)
+        ? current.filter((item) => item !== type)
+        : [...current, type]
+    );
+  };
+
+  const handleSaveAbsences = async () => {
+    if (!user?.id) return;
+
+    try {
+      setSavingAbsences(true);
+      setError(null);
+      setMessage(null);
+
+      if (selectedAbsences.length === 0) {
+        throw new Error('Choose at least one none confirmation to save.');
+      }
+
+      await upsertDailyAbsenceConfirmations({
+        userId: user.id,
+        absenceDate,
+        absenceTypes: selectedAbsences,
+        confirmedAt: new Date().toISOString(),
+      });
+      await refreshAbsenceHistory();
+      setSelectedAbsences([]);
+      setMessage('None confirmations saved. GutWise will count them as data context.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to save none confirmations.');
+    } finally {
+      setSavingAbsences(false);
+    }
+  };
 
   const saveSections = async (keys: SectionKey[]) => {
     if (!user?.id) return;
@@ -481,6 +566,71 @@ export default function DailyCheckIn() {
                     {savingAll ? 'Saving...' : 'Save All Enabled Sections'}
                   </Button>
                 </div>
+              </div>
+            </Card>
+
+            <Card variant="elevated">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                <div>
+                  <div className="inline-flex items-center gap-2 rounded-full border border-neutral-border bg-neutral-bg px-3 py-1 text-xs font-semibold uppercase tracking-widest text-neutral-muted dark:border-dark-border dark:bg-dark-bg dark:text-dark-muted">
+                    <Ban className="h-3.5 w-3.5" />
+                    Mark None
+                  </div>
+                  <h2 className="mt-3 text-body-md font-semibold text-neutral-text dark:text-dark-text">
+                    Confirm what did not happen today
+                  </h2>
+                  <p className="mt-2 max-w-2xl text-body-sm text-neutral-muted dark:text-dark-muted">
+                    These are saved separately from normal logs and count as daily context for
+                    insights.
+                  </p>
+                </div>
+                <div className="text-left text-xs text-neutral-muted dark:text-dark-muted lg:text-right">
+                  <div className="font-semibold uppercase tracking-widest">For {absenceDate}</div>
+                  <div>{todaysAbsences.length} saved today</div>
+                </div>
+              </div>
+
+              <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                {absenceMeta.map((item) => {
+                  const selected = selectedAbsences.includes(item.type);
+                  const saved = todaysAbsences.some(
+                    (historyItem) => historyItem.absence_type === item.type
+                  );
+
+                  return (
+                    <button
+                      key={item.type}
+                      type="button"
+                      onClick={() => toggleAbsence(item.type)}
+                      className={`rounded-xl border px-4 py-3 text-left transition-colors ${
+                        selected || saved
+                          ? 'border-brand-500/40 bg-brand-500/10 text-neutral-text dark:text-dark-text'
+                          : 'border-neutral-border bg-neutral-surface text-neutral-muted hover:border-brand-300 hover:text-neutral-text dark:border-dark-border dark:bg-dark-surface dark:text-dark-muted dark:hover:border-brand-700 dark:hover:text-dark-text'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-body-sm font-semibold">{item.label}</span>
+                        {(selected || saved) && (
+                          <CheckCircle2 className="h-4 w-4 text-brand-500 dark:text-brand-300" />
+                        )}
+                      </div>
+                      <p className="mt-1 text-xs text-neutral-muted dark:text-dark-muted">
+                        {item.description}
+                      </p>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="mt-5 flex justify-end">
+                <Button
+                  variant="outline"
+                  onClick={handleSaveAbsences}
+                  disabled={savingAbsences || selectedAbsences.length === 0}
+                >
+                  <Save className="mr-2 inline h-4 w-4" />
+                  {savingAbsences ? 'Saving...' : 'Save None Confirmations'}
+                </Button>
               </div>
             </Card>
 
@@ -1158,6 +1308,48 @@ export default function DailyCheckIn() {
                     </div>
                   );
                 })}
+                {todaysAbsences.length > 0 && (
+                  <div className="flex items-start gap-3 rounded-xl border border-neutral-border bg-neutral-bg p-3 text-body-sm dark:border-dark-border dark:bg-dark-bg">
+                    <Ban className="mt-0.5 h-4 w-4 text-brand-500 dark:text-brand-300" />
+                    <div>
+                      <span className="font-medium text-neutral-text dark:text-dark-text">
+                        None confirmed
+                      </span>
+                      <p className="mt-1 text-xs text-neutral-muted dark:text-dark-muted">
+                        {todaysAbsences
+                          .map((item) => formatAbsenceLabel(item.absence_type))
+                          .join(', ')}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </Card>
+
+            <Card>
+              <h2 className="text-body-md font-semibold text-neutral-text dark:text-dark-text">
+                None history
+              </h2>
+              <div className="mt-4 space-y-3">
+                {absenceHistory.length === 0 ? (
+                  <p className="text-body-sm text-neutral-muted dark:text-dark-muted">
+                    No none confirmations saved yet.
+                  </p>
+                ) : (
+                  absenceHistory.slice(0, 6).map((item) => (
+                    <div
+                      key={item.id}
+                      className="rounded-xl border border-neutral-border bg-neutral-bg p-3 dark:border-dark-border dark:bg-dark-bg"
+                    >
+                      <div className="text-xs font-semibold uppercase tracking-widest text-neutral-muted dark:text-dark-muted">
+                        {item.absence_date}
+                      </div>
+                      <div className="mt-1 text-body-sm font-medium text-neutral-text dark:text-dark-text">
+                        {formatAbsenceLabel(item.absence_type)}
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </Card>
 
@@ -1167,6 +1359,10 @@ export default function DailyCheckIn() {
       </div>
     </MainLayout>
   );
+}
+
+function formatAbsenceLabel(type: AbsenceType): string {
+  return absenceMeta.find((item) => item.type === type)?.label ?? type.replace(/_/g, ' ');
 }
 
 function MetricPanel({

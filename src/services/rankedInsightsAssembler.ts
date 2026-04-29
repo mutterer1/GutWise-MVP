@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase';
 import type { CanonicalEvent } from '../types/canonicalEvents';
+import type { DailyAbsenceConfirmationRow } from '../types/absenceConfirmations';
 import type { UserDailyFeatures } from '../types/dailyFeatures';
 import type { UserBaselineSet } from '../types/baselines';
 import type {
@@ -20,6 +21,7 @@ import {
   normalizeMedicationEvent,
   normalizeMenstrualCycleEvent,
   normalizeExerciseEvent,
+  normalizeAbsenceConfirmationEvent,
   type EnrichedFoodLogRow,
   type EnrichedMedicationLogRow,
 } from '../lib/canonicalEvents';
@@ -274,11 +276,38 @@ async function fetchEnrichedMedicationRows(
   }));
 }
 
+async function fetchAbsenceConfirmationRows(
+  userId: string,
+  bounds: LoggedAtBounds
+): Promise<DailyAbsenceConfirmationRow[]> {
+  let query = supabase
+    .from('daily_absence_confirmations')
+    .select('*')
+    .eq('user_id', userId)
+    .gte('absence_date', bounds.start.slice(0, 10));
+
+  if (bounds.end) {
+    query = query.lte('absence_date', bounds.end.slice(0, 10));
+  }
+
+  const { data, error } = await query.order('absence_date', { ascending: true });
+
+  if (error) {
+    if (error.code === '42P01') {
+      return [];
+    }
+
+    throw new Error(`Failed to fetch daily_absence_confirmations: ${error.message}`);
+  }
+
+  return (data ?? []) as DailyAbsenceConfirmationRow[];
+}
+
 async function assembleRankedInsightInputsForBounds(
   userId: string,
   bounds: LoggedAtBounds
 ): Promise<AssembledInsightInputs | null> {
-  const [bmRows, symptomRows, foodRows, hydrationRows, sleepRows, stressRows, medicationRows, menstrualRows, exerciseRows] =
+  const [bmRows, symptomRows, foodRows, hydrationRows, sleepRows, stressRows, medicationRows, menstrualRows, exerciseRows, absenceRows] =
     await Promise.all([
       fetchTable<Parameters<typeof normalizeBMEvent>[0]>('bm_logs', userId, bounds),
       fetchTable<Parameters<typeof normalizeSymptomEvent>[0]>('symptom_logs', userId, bounds),
@@ -289,6 +318,7 @@ async function assembleRankedInsightInputsForBounds(
       fetchEnrichedMedicationRows(userId, bounds),
       fetchTable<Parameters<typeof normalizeMenstrualCycleEvent>[0]>('menstrual_cycle_logs', userId, bounds),
       fetchTable<Parameters<typeof normalizeExerciseEvent>[0]>('exercise_logs', userId, bounds),
+      fetchAbsenceConfirmationRows(userId, bounds),
     ]);
 
   const allEvents: CanonicalEvent[] = [
@@ -301,6 +331,7 @@ async function assembleRankedInsightInputsForBounds(
     ...medicationRows.map(normalizeMedicationEvent),
     ...menstrualRows.map(normalizeMenstrualCycleEvent),
     ...exerciseRows.map(normalizeExerciseEvent),
+    ...absenceRows.map(normalizeAbsenceConfirmationEvent),
   ];
 
   if (allEvents.length === 0) return null;

@@ -20,6 +20,17 @@ export interface UserDailyFeatures {
   event_count: number;
   logging_completeness_score: number | null;
 
+  absence_confirmation_count: number;
+  absence_confirmations: string[];
+  no_symptoms_confirmed: boolean;
+  no_stress_confirmed: boolean;
+  no_pain_confirmed: boolean;
+  no_exercise_confirmed: boolean;
+  no_hydration_confirmed: boolean;
+  no_bowel_movement_confirmed: boolean;
+  no_sleep_confirmed: boolean;
+  no_medication_confirmed: boolean;
+
   bm_count: number;
   avg_bristol: number | null;
   hard_stool_count: number;

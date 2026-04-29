@@ -94,7 +94,7 @@ export default function DailyProgressCircle({
                 style={{
                   transition: 'stroke 0.6s ease-out, opacity 0.6s ease-out',
                   opacity: signal.logged ? 1 : 0,
-                  filter: signal.logged ? `drop-shadow(0 0 7px ${signal.color})` : 'none',
+                  filter: 'none',
                 }}
               />
             </g>

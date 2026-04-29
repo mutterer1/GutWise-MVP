@@ -199,9 +199,17 @@ function scoreCandidate(c: InsightCandidate): { score: number; reasons: string[]
 function isUsableCandidate(c: InsightCandidate): boolean {
   const contrastCount = c.evidence.contrast_count ?? 0;
   const evidenceQuality = c.evidence.evidence_quality ?? 'very_low';
+  const isAbsenceRisk = c.subtype === 'absence_risk_pattern';
 
   if (c.status === 'insufficient') return false;
   if (c.data_sufficiency === 'insufficient') return false;
+  if (isAbsenceRisk) {
+    return (
+      c.evidence.exposure_count >= 2 &&
+      c.evidence.support_count >= 2 &&
+      evidenceQuality !== 'very_low'
+    );
+  }
   if (c.evidence.exposure_count < 3) return false;
   if (contrastCount < 3) return false;
   if (c.evidence.support_count < 2) return false;

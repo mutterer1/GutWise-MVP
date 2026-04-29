@@ -111,6 +111,7 @@ const subtypeLabels: Record<string, string> = {
 
   multifactor_stress_sleep_hydration_risk: 'Combined stress, poor sleep, and low hydration',
   compound_risk_day: 'Combined stress, poor sleep, and low hydration',
+  absence_risk_pattern: 'Repeated absence confirmations need attention',
 
   symptom_type_persistence: 'Persistent recurring symptom type detected',
 };

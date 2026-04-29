@@ -20,6 +20,7 @@ import type {
 } from '../types/intelligence';
 import type { CanonicalEvent, EventType } from '../types/canonicalEvents';
 import { EVENT_TYPE_TO_SOURCE_TABLE } from '../types/canonicalEvents';
+import type { DailyAbsenceConfirmationRow } from '../types/absenceConfirmations';
 import { deriveFoodIntelligence } from './foodIntelligence';
 import { deriveMedicationIntelligence } from './medicationIntelligence';
 import type { DerivedFoodIntelligence } from './foodIntelligence';
@@ -1012,6 +1013,29 @@ export function normalizeExerciseEvent(row: ExerciseLogRow): CanonicalEvent {
   };
 }
 
+export function normalizeAbsenceConfirmationEvent(
+  row: DailyAbsenceConfirmationRow
+): CanonicalEvent {
+  return {
+    id: row.id,
+    user_id: row.user_id,
+    event_type: 'absence_confirmation',
+    occurred_at: row.confirmed_at,
+    local_date: row.absence_date,
+    local_hour: deriveLocalHour(row.confirmed_at),
+    timezone: null,
+    source_table: EVENT_TYPE_TO_SOURCE_TABLE.absence_confirmation,
+    completeness_score: 1,
+    payload: {
+      absence_type: row.absence_type,
+      absence_date: row.absence_date,
+      confirmed_at: row.confirmed_at,
+      source: row.source,
+      ...(row.notes != null && { notes: row.notes }),
+    },
+  };
+}
+
 type LogRowUnion =
   | BMLogRow
   | SymptomLogRow
@@ -1021,7 +1045,8 @@ type LogRowUnion =
   | StressLogRow
   | MedicationLogRow
   | MenstrualCycleLogRow
-  | ExerciseLogRow;
+  | ExerciseLogRow
+  | DailyAbsenceConfirmationRow;
 
 const NORMALIZERS: Record<EventType, (row: never) => CanonicalEvent> = {
   bm: normalizeBMEvent as (row: never) => CanonicalEvent,
@@ -1033,6 +1058,7 @@ const NORMALIZERS: Record<EventType, (row: never) => CanonicalEvent> = {
   medication: normalizeMedicationEvent as (row: never) => CanonicalEvent,
   menstrual_cycle: normalizeMenstrualCycleEvent as (row: never) => CanonicalEvent,
   exercise: normalizeExerciseEvent as (row: never) => CanonicalEvent,
+  absence_confirmation: normalizeAbsenceConfirmationEvent as (row: never) => CanonicalEvent,
 };
 
 export function normalizeLogRowToCanonicalEvent(
