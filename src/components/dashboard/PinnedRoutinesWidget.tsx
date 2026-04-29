@@ -368,10 +368,10 @@ export default function PinnedRoutinesWidget() {
   const isAtRoutineLimit = totalCount >= maxRoutines;
 
   return (
-    <section className="card-enter surface-intelligence rounded-[28px] p-4 sm:rounded-[32px] sm:p-6 lg:p-7">
+    <section className="card-enter clinical-card p-4 sm:p-6 lg:p-7">
       <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <span className="badge-secondary mb-3 inline-flex">Pinned</span>
+          <span className="clinical-chip mb-3">Pinned</span>
           <h2 className="text-[clamp(1.45rem,2vw,1.75rem)] font-semibold tracking-[-0.03em] text-[var(--color-text-primary)]">
             Pinned routines
           </h2>
@@ -382,12 +382,12 @@ export default function PinnedRoutinesWidget() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2 sm:justify-end">
-          <span className="rounded-full border border-white/8 bg-white/[0.03] px-3 py-1.5 text-[11px] font-medium text-[var(--color-text-tertiary)]">
+          <span className="clinical-chip">
             {totalCount}/{maxRoutines} routines
           </span>
 
           {lastLoadedAt && (
-            <span className="rounded-full border border-white/8 bg-white/[0.03] px-3 py-1.5 text-[11px] font-medium text-[var(--color-text-tertiary)]">
+            <span className="clinical-chip">
               Updated {formatLoadedAt(lastLoadedAt)}
             </span>
           )}
@@ -423,7 +423,7 @@ export default function PinnedRoutinesWidget() {
           {[0, 1, 2].map((item) => (
             <div
               key={item}
-              className="min-h-[166px] animate-pulse rounded-[24px] border border-white/8 bg-white/[0.03]"
+              className="min-h-[166px] animate-pulse rounded-[24px] border border-white/8 bg-white/[0.025]"
             />
           ))}
         </div>
@@ -446,7 +446,7 @@ export default function PinnedRoutinesWidget() {
             return (
               <article
                 key={routine.id}
-                className="rounded-[24px] border border-[rgba(143,128,246,0.16)] bg-[rgba(143,128,246,0.06)] p-4 transition-smooth hover:border-[rgba(143,128,246,0.30)] hover:bg-[rgba(143,128,246,0.09)]"
+                className="rounded-[24px] border border-[rgba(202,190,255,0.12)] bg-white/[0.03] p-4 transition-smooth hover:border-[rgba(202,190,255,0.22)] hover:bg-white/[0.045]"
               >
                 <div className="mb-4 flex items-start justify-between gap-3">
                   <div className="flex items-start gap-3">

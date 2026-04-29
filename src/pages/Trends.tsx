@@ -12,7 +12,6 @@ import {
   Gauge,
   Loader2,
   Moon,
-  Sparkles,
   TrendingUp,
   Waves as Wave,
   Zap,
@@ -46,7 +45,7 @@ const timeRangeMeta: Record<
   },
   14: {
     title: 'Pattern arc',
-    description: 'Best for seeing whether a signal repeats beyond a one-off event.',
+    description: 'Best for seeing whether a pattern repeats beyond a one-off event.',
   },
   30: {
     title: 'Month scan',
@@ -63,11 +62,11 @@ interface TrendSummaryStats {
   sleepDays: number;
   stressDays: number;
   urgencyEvents: number;
-  activeSignals: number;
+  activeLanes: number;
   coverageScore: number;
 }
 
-interface SignalMapItem {
+interface TrendMapItem {
   label: string;
   value: string;
   helper: string;
@@ -91,7 +90,7 @@ export default function Trends() {
         sleepDays: 0,
         stressDays: 0,
         urgencyEvents: 0,
-        activeSignals: 0,
+        activeLanes: 0,
         coverageScore: 0,
       };
     }
@@ -123,7 +122,7 @@ export default function Trends() {
       (sum, item) => sum + item.urgencyEpisodes,
       0
     );
-    const activeSignals = [
+    const activeLanes = [
       totalBMs > 0,
       totalBristolRecords > 0,
       symptomDays > 0,
@@ -141,12 +140,12 @@ export default function Trends() {
       sleepDays,
       stressDays,
       urgencyEvents,
-      activeSignals,
-      coverageScore: Math.round((activeSignals / 6) * 100),
+      activeLanes,
+      coverageScore: Math.round((activeLanes / 6) * 100),
     };
   }, [data]);
 
-  const signalMap = useMemo<SignalMapItem[]>(
+  const trendMap = useMemo<TrendMapItem[]>(
     () => [
       {
         label: 'Gut rhythm',
@@ -243,24 +242,24 @@ export default function Trends() {
   return (
     <MainLayout>
       <div className="mx-auto max-w-7xl space-y-6">
-        <section className="page-enter signal-card signal-card-major rounded-[40px] p-5 sm:p-6 lg:p-8">
+        <section className="page-enter clinical-panel p-5 sm:p-6 lg:p-7">
           <div className="grid gap-7 xl:grid-cols-[minmax(0,1fr)_380px] xl:items-end">
             <div className="max-w-4xl">
-              <span className="signal-badge signal-badge-major mb-5">
-                <Sparkles className="h-3.5 w-3.5" />
-                Trend Intelligence Console
+              <span className="clinical-chip clinical-chip-intelligence mb-4">
+                <BarChart3 className="h-3.5 w-3.5" />
+                Trend review
               </span>
               <h1 className="page-title">Trends & Analytics</h1>
               <p className="page-subtitle mt-3">
-                Read bowel rhythm, symptoms, hydration, sleep, and stress as connected signal lanes
+                Read bowel rhythm, symptoms, hydration, sleep, and stress as connected trend lanes
                 instead of isolated charts.
               </p>
 
               <div className="mt-7 grid gap-3 sm:grid-cols-3">
                 <HeroMetric
-                  label="Signal Coverage"
+                  label="Data Coverage"
                   value={`${summaryStats.coverageScore}%`}
-                  helper={`${summaryStats.activeSignals}/6 lanes active`}
+                  helper={`${summaryStats.activeLanes}/6 lanes active`}
                 />
                 <HeroMetric
                   label="Window"
@@ -275,7 +274,7 @@ export default function Trends() {
               </div>
             </div>
 
-            <div className="surface-panel-soft print:hidden rounded-[32px] p-5">
+            <div className="clinical-card print:hidden p-5">
               <p className="data-kicker">Current Read</p>
               <p className="mt-3 text-lg font-semibold tracking-[-0.02em] text-[var(--color-text-primary)]">
                 {timeRangeMeta[selectedRange.days].title}
@@ -306,11 +305,11 @@ export default function Trends() {
 
         <section className="grid gap-4 print:hidden xl:grid-cols-[360px_minmax(0,1fr)]">
           <PeriodSelector selectedRange={selectedRange} onSelect={setSelectedRange} />
-          <SignalMapPanel items={signalMap} />
+          <TrendMapPanel items={trendMap} />
         </section>
 
         {loading && (
-          <section className="surface-panel rounded-[32px]">
+          <section className="clinical-card">
             <div className="flex items-center justify-center py-16">
               <Loader2 className="h-8 w-8 animate-spin text-[var(--gw-intelligence-200)]" />
               <span className="ml-3 text-sm text-[var(--color-text-tertiary)]">
@@ -321,7 +320,7 @@ export default function Trends() {
         )}
 
         {error && (
-          <section className="surface-panel rounded-[32px]">
+          <section className="clinical-card">
             <div className="py-12 text-center">
               <p className="text-sm font-medium text-[var(--color-danger)]">{error}</p>
             </div>
@@ -365,7 +364,7 @@ export default function Trends() {
             </section>
 
             <section className="grid gap-6 xl:grid-cols-[300px_minmax(0,1fr)]">
-              <aside className="surface-panel-soft h-fit rounded-[32px] p-5 xl:sticky xl:top-6">
+              <aside className="clinical-card h-fit p-5 xl:sticky xl:top-6">
                 <p className="data-kicker">Analysis Route</p>
                 <h2 className="mt-3 text-2xl font-semibold tracking-[-0.04em] text-[var(--color-text-primary)]">
                   Read in lanes
@@ -413,7 +412,7 @@ export default function Trends() {
                 <AnalysisLane
                   kicker="Lane 03"
                   title="Context overlays"
-                  description="Hydration and sleep do not diagnose cause, but they can explain why a signal changed."
+                  description="Hydration and sleep do not diagnose cause, but they can help explain why a pattern changed."
                 >
                   <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                     <div className="print:break-inside-avoid">
@@ -454,7 +453,7 @@ function PeriodSelector({
   onSelect: (range: TimeRange) => void;
 }) {
   return (
-    <section className="surface-panel-soft rounded-[32px] p-5">
+    <section className="clinical-card p-5">
       <div className="flex items-center gap-2 text-[var(--color-text-primary)]">
         <Calendar className="h-5 w-5 text-[var(--gw-intelligence-200)]" />
         <span className="data-kicker">Time Period</span>
@@ -472,7 +471,7 @@ function PeriodSelector({
               className={[
                 'w-full rounded-[24px] border p-4 text-left transition-smooth',
                 selected
-                  ? 'border-[rgba(216,199,255,0.32)] bg-[rgba(139,92,246,0.16)] shadow-[var(--gw-glow-intelligence-soft)]'
+                  ? 'border-[rgba(216,199,255,0.28)] bg-[rgba(139,92,246,0.12)]'
                   : 'border-white/8 bg-white/[0.025] hover:border-[rgba(216,199,255,0.2)] hover:bg-white/[0.045]',
               ].join(' ')}
             >
@@ -480,7 +479,7 @@ function PeriodSelector({
                 <p className="text-sm font-semibold text-[var(--color-text-primary)]">
                   {range.label}
                 </p>
-                {selected && <span className="signal-badge signal-badge-daily">Active</span>}
+                {selected && <span className="clinical-chip">Active</span>}
               </div>
               <p className="mt-2 text-xs leading-5 text-[var(--color-text-tertiary)]">
                 {timeRangeMeta[range.days].description}
@@ -493,20 +492,20 @@ function PeriodSelector({
   );
 }
 
-function SignalMapPanel({ items }: { items: SignalMapItem[] }) {
+function TrendMapPanel({ items }: { items: TrendMapItem[] }) {
   return (
-    <section className="surface-panel rounded-[32px] p-5 sm:p-6">
+    <section className="clinical-card p-5 sm:p-6">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <span className="signal-badge signal-badge-daily mb-3">
+          <span className="clinical-chip mb-3">
             <BarChart3 className="h-3.5 w-3.5" />
-            Signal Map
+            Trend map
           </span>
           <h2 className="text-2xl font-semibold tracking-[-0.04em] text-[var(--color-text-primary)]">
             Connected trend lanes
           </h2>
           <p className="mt-2 text-sm leading-6 text-[var(--color-text-secondary)]">
-            Each lane tells you whether GutWise has enough recent data to support useful visual
+            Each lane shows whether GutWise has enough recent data to support useful visual
             comparison.
           </p>
         </div>
@@ -514,14 +513,14 @@ function SignalMapPanel({ items }: { items: SignalMapItem[] }) {
 
       <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {items.map((item) => (
-          <SignalMapCard key={item.label} item={item} />
+          <TrendMapCard key={item.label} item={item} />
         ))}
       </div>
     </section>
   );
 }
 
-function SignalMapCard({ item }: { item: SignalMapItem }) {
+function TrendMapCard({ item }: { item: TrendMapItem }) {
   const Icon = item.icon;
   const toneClassName = {
     major: 'bg-[rgba(124,58,237,0.18)] text-[var(--gw-intelligence-100)]',
@@ -596,7 +595,7 @@ function RouteStep({
   return (
     <div className="rounded-[22px] border border-[rgba(202,190,255,0.12)] bg-white/[0.03] p-4">
       <div className="flex items-start gap-3">
-        <span className="signal-rank">{number}</span>
+        <span className="step-rank">{number}</span>
         <div>
           <p className="text-sm font-semibold text-[var(--color-text-primary)]">{label}</p>
           <p className="mt-1 text-xs leading-5 text-[var(--color-text-tertiary)]">{helper}</p>
@@ -608,10 +607,10 @@ function RouteStep({
 
 function InterpretationGuide() {
   return (
-    <section className="surface-panel rounded-[34px] p-5 sm:p-6">
+    <section className="clinical-card p-5 sm:p-6">
       <div className="grid gap-5 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
         <div>
-          <span className="signal-badge signal-badge-daily mb-4">
+          <span className="clinical-chip mb-4">
             <Activity className="h-3.5 w-3.5" />
             Reading Standard
           </span>
@@ -627,7 +626,7 @@ function InterpretationGuide() {
         <div className="grid gap-3 sm:grid-cols-3">
           <GuideCard
             label="Repeat"
-            helper="Prioritize signals that recur across multiple days or cycles."
+            helper="Prioritize patterns that recur across multiple days or cycles."
           />
           <GuideCard
             label="Layer"
@@ -682,7 +681,7 @@ function SummaryCard({
   helper: string;
 }) {
   return (
-    <section className="signal-card signal-card-daily print:break-inside-avoid rounded-[28px] p-5">
+    <section className="clinical-card print:break-inside-avoid p-5">
       <div className="space-y-3">
         <div className="flex items-center gap-2">
           {icon}

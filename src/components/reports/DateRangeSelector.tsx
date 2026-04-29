@@ -1,4 +1,4 @@
-import { Calendar, Clock3, Sparkles } from 'lucide-react';
+import { Calendar, Clock3 } from 'lucide-react';
 import Button from '../Button';
 
 interface DateRangeSelectorProps {
@@ -37,7 +37,7 @@ export default function DateRangeSelector({
   const dayCount = getRangeDayCount(startDate, endDate);
 
   return (
-    <section className="signal-card signal-card-daily rounded-[30px] p-5 sm:p-6 print:border-0 print:bg-transparent print:p-0">
+    <section className="clinical-card p-5 sm:p-6 print:border-0 print:bg-transparent print:p-0">
       <div className="grid gap-5 border-b border-[rgba(197,168,255,0.12)] pb-5 lg:grid-cols-[1fr_0.8fr] lg:items-start">
         <div className="min-w-0">
           <div className="flex items-start gap-4">
@@ -46,8 +46,8 @@ export default function DateRangeSelector({
             </div>
 
             <div>
-              <span className="signal-badge signal-badge-major mb-3">
-                <Sparkles className="h-3.5 w-3.5" />
+              <span className="clinical-chip clinical-chip-intelligence mb-3">
+                <Calendar className="h-3.5 w-3.5" />
                 Report Period
               </span>
               <h3 className="text-xl font-semibold tracking-[-0.035em] text-[var(--color-text-primary)]">

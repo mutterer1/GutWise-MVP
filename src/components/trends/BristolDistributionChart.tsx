@@ -76,7 +76,7 @@ export default function BristolDistributionChart({ data }: BristolDistributionCh
         { label: 'Target range', color: TREND_CHART_COLORS.primary, variant: 'dot' },
         { label: 'Looser range', color: TREND_CHART_COLORS.rose, variant: 'dot' },
       ]}
-      insight="The useful signal is the cluster shape. A balanced middle cluster is different from a split hard-and-loose pattern."
+      insight="The useful read is the cluster shape. A balanced middle cluster is different from a split hard-and-loose pattern."
     >
       <div className="chart-plot-area px-4 py-5">
         <div className="grid grid-cols-[repeat(auto-fit,minmax(92px,1fr))] gap-3">
@@ -99,12 +99,12 @@ export default function BristolDistributionChart({ data }: BristolDistributionCh
                 <span className="data-kicker">Type {item.type}</span>
 
                 <div
-                  className="relative grid place-items-center rounded-full border border-white/20 shadow-[0_0_30px_rgba(139,92,246,0.2)]"
+                  className="relative grid place-items-center rounded-full border border-white/20"
                   style={{
                     width: `${size}px`,
                     height: `${size}px`,
                     background: `radial-gradient(circle at 35% 25%, rgba(255,255,255,0.42), transparent 28%), ${bristolColors[item.type]}`,
-                    boxShadow: `0 0 ${item.percentage > 0 ? 36 : 12}px ${bristolColors[item.type]}66`,
+                    boxShadow: item.percentage > 0 ? `0 0 0 1px ${bristolColors[item.type]}33` : 'none',
                   }}
                 >
                   <span className="text-sm font-semibold text-white">{item.percentage}%</span>

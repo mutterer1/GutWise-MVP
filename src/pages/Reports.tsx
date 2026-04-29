@@ -9,7 +9,6 @@ import {
   MessageSquare,
   Printer,
   ShieldCheck,
-  Sparkles,
 } from 'lucide-react';
 import MainLayout from '../components/MainLayout';
 import Button from '../components/Button';
@@ -262,25 +261,20 @@ export default function Reports() {
   return (
     <MainLayout>
       <div className="relative min-h-screen overflow-hidden pb-12 print:bg-white print:pb-0">
-        <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[34rem] bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,rgba(139,92,246,0.22)_0%,rgba(91,184,240,0.08)_40%,transparent_78%)] print:hidden" />
-        <div className="pointer-events-none absolute right-[-10rem] top-28 h-80 w-80 rounded-full bg-[rgba(197,168,255,0.11)] blur-3xl print:hidden" />
-        <div className="pointer-events-none absolute left-[-8rem] top-[30rem] h-72 w-72 rounded-full bg-[rgba(91,184,240,0.08)] blur-3xl print:hidden" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[26rem] bg-[radial-gradient(ellipse_70%_50%_at_50%_0%,rgba(139,92,246,0.09)_0%,rgba(91,184,240,0.035)_42%,transparent_76%)] print:hidden" />
 
         <div className="relative z-10 mx-auto max-w-7xl print:p-8">
-          <section className="page-enter relative mb-6 overflow-hidden rounded-[38px] border border-[rgba(197,168,255,0.18)] bg-[linear-gradient(135deg,rgba(13,16,38,0.9),rgba(32,22,61,0.82))] p-5 shadow-[0_28px_90px_rgba(6,8,24,0.34)] sm:p-7 lg:p-8 print:hidden">
-            <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-[rgba(197,168,255,0.65)] to-transparent" />
-            <div className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-[rgba(139,92,246,0.22)] blur-3xl" />
-
+          <section className="page-enter clinical-panel mb-6 p-5 sm:p-6 lg:p-7 print:hidden">
             <div className="relative grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
               <div>
-                <span className="signal-badge signal-badge-major mb-5">
+                <span className="clinical-chip clinical-chip-intelligence mb-4">
                   <FileText className="h-3.5 w-3.5" />
-                  Clinician Briefing Console
+                  Clinical report
                 </span>
-                <h1 className="max-w-4xl text-4xl font-semibold tracking-[-0.06em] text-[var(--color-text-primary)] sm:text-5xl lg:text-6xl">
-                  Turn your logs into a clinician-ready briefing
+                <h1 className="max-w-4xl text-3xl font-semibold tracking-[-0.04em] text-[var(--color-text-primary)] sm:text-4xl lg:text-5xl">
+                  Build a clinical summary
                 </h1>
-                <p className="mt-5 max-w-3xl text-base leading-8 text-[var(--color-text-secondary)]">
+                <p className="mt-4 max-w-3xl text-base leading-7 text-[var(--color-text-secondary)]">
                   Build a non-diagnostic summary that leads with observed data, highlights review
                   flags, preserves pattern evidence, and gives you a focused appointment narrative.
                 </p>
@@ -364,7 +358,7 @@ export default function Reports() {
           </div>
 
           {loading && (
-            <section className="surface-panel flex h-80 flex-col items-center justify-center gap-4 rounded-[34px]">
+            <section className="clinical-card flex h-80 flex-col items-center justify-center gap-4">
               <div className="insight-orb">
                 <Loader2 className="h-5 w-5 animate-spin text-white" />
               </div>
@@ -380,7 +374,7 @@ export default function Reports() {
           )}
 
           {!loading && !error && !bmAnalytics && (
-            <section className="surface-panel rounded-[36px] px-6 py-12 text-center sm:px-10 sm:py-16">
+            <section className="clinical-card px-6 py-12 text-center sm:px-10 sm:py-16">
               <div className="insight-orb mx-auto mb-6">
                 <FileText className="h-5 w-5 text-white" />
               </div>
@@ -397,9 +391,9 @@ export default function Reports() {
           {!loading && !error && bmAnalytics && (
             <>
               <section className="mb-5 grid gap-4 print:hidden lg:grid-cols-[1.1fr_0.9fr]">
-                <div className="signal-card signal-card-daily rounded-[30px] p-5">
-                  <span className="signal-badge signal-badge-major mb-4">
-                    <Sparkles className="h-3.5 w-3.5" />
+                <div className="clinical-card p-5">
+                  <span className="clinical-chip clinical-chip-intelligence mb-4">
+                    <ShieldCheck className="h-3.5 w-3.5" />
                     Briefing Standard
                   </span>
                   <p className="text-sm leading-7 text-[var(--color-text-secondary)]">
@@ -409,7 +403,7 @@ export default function Reports() {
                   </p>
                 </div>
 
-                <div className="signal-card rounded-[30px] p-5">
+                <div className="clinical-card p-5">
                   <p className="data-kicker">Generated</p>
                   <p className="mt-2 text-lg font-semibold tracking-[-0.03em] text-[var(--color-text-primary)]">
                     {new Date().toLocaleDateString('en-US', {
@@ -464,7 +458,7 @@ export default function Reports() {
 
               <PatientNotesSection value={patientNotes} onChange={setPatientNotes} />
 
-              <section className="mt-6 rounded-[34px] border border-[rgba(197,168,255,0.16)] bg-[rgba(10,13,31,0.64)] p-5 shadow-[0_18px_54px_rgba(5,8,22,0.18)] print:mt-10 print:border-gray-300 print:bg-white print:p-6">
+              <section className="clinical-card mt-6 p-5 print:mt-10 print:border-gray-300 print:bg-white print:p-6">
                 <div className="mb-5 flex items-center gap-2 border-b border-[rgba(197,168,255,0.12)] pb-4 print:border-gray-200">
                   <MessageSquare className="h-4 w-4 text-[var(--gw-intelligence-300)] print:text-gray-700" />
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--gw-intelligence-300)] print:text-gray-500">
@@ -554,7 +548,7 @@ export default function Reports() {
 
 function HeroPill({ icon, label }: { icon: ReactNode; label: string }) {
   return (
-    <span className="inline-flex items-center gap-2 rounded-full border border-[rgba(197,168,255,0.16)] bg-white/[0.045] px-3.5 py-2 text-xs font-semibold text-[var(--color-text-secondary)]">
+    <span className="clinical-chip">
       <span className="text-[var(--gw-intelligence-300)]">{icon}</span>
       {label}
     </span>
@@ -563,7 +557,7 @@ function HeroPill({ icon, label }: { icon: ReactNode; label: string }) {
 
 function HeroMetric({ label, value, helper }: { label: string; value: string; helper: string }) {
   return (
-    <div className="rounded-[24px] border border-[rgba(197,168,255,0.16)] bg-white/[0.045] p-4 backdrop-blur">
+    <div className="clinical-card p-4">
       <p className="metric-label">{label}</p>
       <p className="metric-value mt-2 text-[2.15rem]">{value}</p>
       <p className="mt-1 text-xs leading-5 text-[var(--color-text-tertiary)]">{helper}</p>

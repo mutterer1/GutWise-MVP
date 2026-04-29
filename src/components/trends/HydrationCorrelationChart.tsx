@@ -85,7 +85,7 @@ export default function HydrationCorrelationChart({ data }: HydrationCorrelation
               <div key={item.date} className="group relative flex h-full flex-1 flex-col justify-end">
                 {item.avgBristolScale !== null && (
                   <div
-                    className="absolute left-1/2 z-[2] h-4 w-4 -translate-x-1/2 rounded-full border border-white/70 shadow-[0_0_22px_rgba(255,255,255,0.16)]"
+                    className="absolute left-1/2 z-[2] h-4 w-4 -translate-x-1/2 rounded-full border border-white/70"
                     style={{ top: `${bristolPosition}%`, backgroundColor: bristolColor }}
                   />
                 )}
@@ -96,11 +96,11 @@ export default function HydrationCorrelationChart({ data }: HydrationCorrelation
                     style={{ height: `${Math.max(totalHeight, item.totalFluids > 0 ? 4 : 0)}%` }}
                   />
                   <div
-                    className="absolute bottom-0 left-[18%] right-[18%] rounded-t-[18px] bg-[linear-gradient(180deg,var(--gw-brand-200),var(--gw-brand-600))] shadow-[0_0_24px_rgba(91,184,240,0.26)]"
+                    className="absolute bottom-0 left-[18%] right-[18%] rounded-t-[18px] bg-[linear-gradient(180deg,var(--gw-brand-200),var(--gw-brand-600))]"
                     style={{ height: `${Math.max(effectiveHeight, item.effectiveHydration > 0 ? 4 : 0)}%` }}
                   />
                   <div
-                    className="absolute bottom-0 left-[34%] right-[34%] rounded-t-[18px] bg-[var(--gw-intelligence-300)] shadow-[0_0_24px_rgba(197,168,255,0.24)]"
+                    className="absolute bottom-0 left-[34%] right-[34%] rounded-t-[18px] bg-[var(--gw-intelligence-300)]"
                     style={{ height: `${Math.max(goalHeight, item.totalHydration > 0 ? 4 : 0)}%` }}
                   />
                 </div>

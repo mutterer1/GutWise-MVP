@@ -13,7 +13,7 @@ export default function BMAnalyticsSection({ analytics }: BMAnalyticsSectionProp
   const isWithinReferenceRange = averagePerDay >= 1 && averagePerDay <= 3;
 
   return (
-    <div className="mb-5 rounded-2xl border border-gray-200 bg-white p-6 print:border-gray-300 dark:border-white/[0.08] dark:bg-white/[0.04]">
+    <section className="clinical-card mb-5 p-5 print:border-gray-300 print:bg-white print:p-6">
       <div className="mb-4 border-b border-gray-100 pb-3 dark:border-white/[0.06]">
         <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400">
           Bowel Movement Frequency
@@ -62,7 +62,7 @@ export default function BMAnalyticsSection({ analytics }: BMAnalyticsSectionProp
               : 'Logged frequency is above the common reference range of 1 to 3 bowel movements per day.'}
         </p>
       </div>
-    </div>
+    </section>
   );
 }
 

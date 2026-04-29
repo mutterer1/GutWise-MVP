@@ -70,7 +70,7 @@ export default function HealthMarkersSection({
   const sleepCorrelation = calculateSleepSymptomCorrelation(correlations);
 
   return (
-    <div className="mb-5 rounded-2xl border border-gray-200 bg-white p-6 print:border-gray-300 dark:border-white/[0.08] dark:bg-white/[0.04]">
+    <section className="clinical-card mb-5 p-5 print:border-gray-300 print:bg-white print:p-6">
       <div className="mb-4 border-b border-gray-100 pb-3 dark:border-white/[0.06]">
         <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400">
           Contextual Health Markers
@@ -196,6 +196,6 @@ export default function HealthMarkersSection({
           </p>
         </>
       )}
-    </div>
+    </section>
   );
 }

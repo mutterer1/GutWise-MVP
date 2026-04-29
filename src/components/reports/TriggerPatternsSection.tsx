@@ -5,7 +5,7 @@ interface TriggerPatternsSectionProps {
   triggers: TriggerPattern[];
 }
 
-function getSignalLevel(correlationStrength: number): {
+function getPatternLevel(correlationStrength: number): {
   label: string;
   containerClass: string;
   valueClass: string;
@@ -13,7 +13,7 @@ function getSignalLevel(correlationStrength: number): {
 } {
   if (correlationStrength > 0.6) {
     return {
-      label: 'Stronger signal',
+      label: 'Stronger pattern',
       containerClass: 'border-[#C28F94]/40 bg-[#C28F94]/08 dark:bg-[#C28F94]/08',
       valueClass: 'text-[#8D5D62] dark:text-[#C28F94]',
       summary:
@@ -23,7 +23,7 @@ function getSignalLevel(correlationStrength: number): {
 
   if (correlationStrength > 0.4) {
     return {
-      label: 'Moderate signal',
+      label: 'Moderate pattern',
       containerClass:
         'border-amber-300/50 bg-amber-50/50 dark:border-amber-700/30 dark:bg-amber-900/08',
       valueClass: 'text-amber-600 dark:text-amber-400',
@@ -33,7 +33,7 @@ function getSignalLevel(correlationStrength: number): {
   }
 
   return {
-    label: 'Weaker signal',
+    label: 'Weaker pattern',
     containerClass: 'border-gray-200 bg-gray-50/50 dark:border-white/[0.06] dark:bg-white/[0.02]',
     valueClass: 'text-gray-600 dark:text-gray-400',
     summary:
@@ -47,7 +47,7 @@ export default function TriggerPatternsSection({
   const hasData = triggers.length > 0;
 
   return (
-    <div className="mb-5 rounded-2xl border border-gray-200 bg-white p-6 print:border-gray-300 dark:border-white/[0.08] dark:bg-white/[0.04]">
+    <section className="clinical-card mb-5 p-5 print:border-gray-300 print:bg-white print:p-6">
       <div className="mb-4 border-b border-gray-100 pb-3 dark:border-white/[0.06]">
         <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400">
           Trigger Patterns
@@ -74,13 +74,13 @@ export default function TriggerPatternsSection({
 
           <div className="mb-5 space-y-3">
             {triggers.map((trigger, index) => {
-              const signal = getSignalLevel(trigger.correlationStrength);
+              const pattern = getPatternLevel(trigger.correlationStrength);
               const correlationPercentage = trigger.correlationStrength * 100;
 
               return (
                 <div
                   key={`${trigger.trigger}-${index}`}
-                  className={`rounded-xl border p-4 ${signal.containerClass}`}
+                  className={`rounded-xl border p-4 ${pattern.containerClass}`}
                 >
                   <div className="mb-2 flex items-start justify-between gap-4">
                     <div className="flex-1">
@@ -98,7 +98,7 @@ export default function TriggerPatternsSection({
                     </div>
 
                     <div className="ml-4 flex-shrink-0 text-right">
-                      <div className={`text-xl font-bold tabular-nums ${signal.valueClass}`}>
+                      <div className={`text-xl font-bold tabular-nums ${pattern.valueClass}`}>
                         {correlationPercentage.toFixed(0)}%
                       </div>
                       <p className="text-xs text-gray-400 dark:text-gray-500">association rate</p>
@@ -111,11 +111,11 @@ export default function TriggerPatternsSection({
                       label="Avg symptom severity"
                       value={`${trigger.avgSymptomSeverity.toFixed(1)}/10`}
                     />
-                    <Stat label="Signal" value={signal.label} valueClass={signal.valueClass} />
+                    <Stat label="Pattern" value={pattern.label} valueClass={pattern.valueClass} />
                   </div>
 
                   <div className="border-t border-gray-200/60 pt-2.5 text-xs leading-relaxed text-gray-600 dark:border-white/[0.05] dark:text-gray-400">
-                    {signal.summary}
+                    {pattern.summary}
                   </div>
                 </div>
               );
@@ -131,7 +131,7 @@ export default function TriggerPatternsSection({
           </div>
         </>
       )}
-    </div>
+    </section>
   );
 }
 

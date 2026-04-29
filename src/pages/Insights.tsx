@@ -12,7 +12,6 @@ import {
   Loader2,
   RefreshCw,
   ShieldCheck,
-  Sparkles,
   Target,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
@@ -154,7 +153,7 @@ export default function Insights() {
           rankedInsights.analyzed_to
         )}`
       : 'Window building';
-  const strongSignalCount = rankedCandidates.filter(
+  const highPriorityPatternCount = rankedCandidates.filter(
     (candidate) => candidate.priority_tier === 'high'
   ).length;
   const totalEvidenceGapCount = evidenceGapSummaries.reduce(
@@ -169,28 +168,23 @@ export default function Insights() {
         data-insight-source={insightSource}
         data-explanation-origin={explanationOrigin}
       >
-        <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[34rem] bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,rgba(139,92,246,0.14)_0%,rgba(91,184,240,0.06)_38%,transparent_78%)]" />
-        <div className="pointer-events-none absolute right-[-10rem] top-36 h-80 w-80 rounded-full bg-[rgba(197,168,255,0.07)] blur-3xl" />
-        <div className="pointer-events-none absolute left-[-8rem] top-[28rem] h-72 w-72 rounded-full bg-[rgba(91,184,240,0.05)] blur-3xl" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[26rem] bg-[radial-gradient(ellipse_70%_50%_at_50%_0%,rgba(139,92,246,0.08)_0%,rgba(91,184,240,0.035)_42%,transparent_76%)]" />
 
         <div className="relative z-10 mx-auto max-w-7xl space-y-6">
-          <section className="page-enter relative overflow-hidden rounded-[38px] border border-[rgba(197,168,255,0.14)] bg-[linear-gradient(135deg,rgba(13,16,38,0.92),rgba(28,21,54,0.82))] p-5 shadow-[0_24px_64px_rgba(6,8,24,0.3)] sm:p-7 lg:p-8">
-            <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-[rgba(197,168,255,0.65)] to-transparent" />
-            <div className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-[rgba(139,92,246,0.12)] blur-3xl" />
-
+          <section className="page-enter clinical-panel p-5 sm:p-6 lg:p-7">
             <div className="relative grid gap-8 lg:grid-cols-[1.18fr_0.82fr] lg:items-end">
               <div>
-                <span className="signal-badge signal-badge-major mb-5">
+                <span className="clinical-chip clinical-chip-intelligence mb-4">
                   <Brain className="h-3.5 w-3.5" />
-                  Health Intelligence Console
+                  Health insights
                 </span>
-                <h1 className="max-w-4xl text-4xl font-semibold tracking-[-0.06em] text-[var(--color-text-primary)] sm:text-5xl lg:text-6xl">
-                  Find the patterns hiding between your logs
+                <h1 className="max-w-4xl text-3xl font-semibold tracking-[-0.04em] text-[var(--color-text-primary)] sm:text-4xl lg:text-5xl">
+                  Review patterns across your logs
                 </h1>
-                <p className="mt-5 max-w-3xl text-base leading-8 text-[var(--color-text-secondary)]">
+                <p className="mt-4 max-w-3xl text-base leading-7 text-[var(--color-text-secondary)]">
                   GutWise compares bowel movements, food, hydration, symptoms, stress, sleep,
-                  movement, medication, cycle context, and medical history to surface clinician-safe
-                  pattern intelligence.
+                  movement, medication, cycle context, and medical history to surface evidence-bound
+                  pattern summaries.
                 </p>
 
                 <div className="mt-6 flex flex-wrap gap-3">
@@ -201,8 +195,8 @@ export default function Insights() {
               </div>
 
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
-                <HeroMetric label="Patterns" value={`${rankedCandidates.length}`} helper="Ranked signals" />
-                <HeroMetric label="Strong" value={`${strongSignalCount}`} helper="High-priority signals" />
+                <HeroMetric label="Patterns" value={`${rankedCandidates.length}`} helper="Ranked patterns" />
+                <HeroMetric label="Priority" value={`${highPriorityPatternCount}`} helper="High-priority patterns" />
                 <HeroMetric
                   label="Window"
                   value={`${rankedInsights?.input_day_count ?? 0}d`}
@@ -229,7 +223,7 @@ export default function Insights() {
                     </>
                   ) : (
                     <>
-                      <Sparkles className="h-4 w-4" />
+                      <RefreshCw className="h-4 w-4" />
                       Refresh Insights
                     </>
                   )}
@@ -240,19 +234,19 @@ export default function Insights() {
 
           {error && <AlertPanel tone="danger" message={error} />}
 
-          {rankedLoading && <LoadingConsole />}
+          {rankedLoading && <LoadingPanel />}
 
           {isRankedPrimary && (
             <section className="space-y-5">
-              <div className="surface-panel rounded-[34px] p-5 sm:p-6">
+              <div className="clinical-card p-5 sm:p-6">
                 <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
                   <div>
                     <div className="mb-3 flex flex-wrap items-center gap-2.5">
                       <h2 className="text-3xl font-semibold tracking-[-0.045em] text-[var(--color-text-primary)]">
-                        Ranked Pattern Signals
+                        Ranked patterns
                       </h2>
                       {explanationOrigin !== 'none' && !explanationError && (
-                        <span className="signal-badge signal-badge-major">AI explained</span>
+                        <span className="clinical-chip clinical-chip-intelligence">Explanations available</span>
                       )}
                     </div>
                     <p className="max-w-3xl text-sm leading-6 text-[var(--color-text-secondary)]">
@@ -288,10 +282,10 @@ export default function Insights() {
                         </>
                       ) : (
                         <>
-                          <Sparkles className="h-4 w-4" />
+                          <Activity className="h-4 w-4" />
                           {explanationOrigin === 'none'
-                            ? 'Explain Patterns'
-                            : 'Refresh Explanations'}
+                            ? 'Generate explanations'
+                            : 'Refresh explanations'}
                         </>
                       )}
                     </button>
@@ -302,7 +296,7 @@ export default function Insights() {
               {validationStatus === 'invalid' && (
                 <AlertPanel
                   tone="danger"
-                  message="AI explanations could not be verified and will not be shown. Your ranked patterns are still displayed below."
+                  message="Generated explanations could not be verified and will not be shown. Your ranked patterns are still displayed below."
                 />
               )}
 
@@ -356,7 +350,7 @@ export default function Insights() {
               />
 
               {loading ? (
-                <LoadingConsole label="Loading your saved observations..." />
+                <LoadingPanel label="Loading your saved observations..." />
               ) : insights.length === 0 ? (
                 <LegacyEmptyState
                   generating={generating}
@@ -364,14 +358,14 @@ export default function Insights() {
                 />
               ) : (
                 <>
-                  <div className="surface-panel rounded-[28px] px-5 py-4">
+                  <div className="clinical-card px-5 py-4">
                     <div className="flex flex-wrap items-center gap-3 text-sm text-[var(--color-text-tertiary)]">
                       <span>
                         {insights.length}{' '}
                         {insights.length === 1 ? 'observation' : 'observations'} found
                       </span>
                       <span className="text-white/10">/</span>
-                      <span>Based on repeated signals in your logs</span>
+                      <span>Based on repeated observations in your logs</span>
                     </div>
                   </div>
 
@@ -392,7 +386,7 @@ export default function Insights() {
 
 function HeroPill({ icon, label }: { icon: ReactNode; label: string }) {
   return (
-    <span className="inline-flex items-center gap-2 rounded-full border border-[rgba(197,168,255,0.16)] bg-white/[0.045] px-3.5 py-2 text-xs font-semibold text-[var(--color-text-secondary)]">
+    <span className="clinical-chip">
       <span className="text-[var(--gw-intelligence-300)]">{icon}</span>
       {label}
     </span>
@@ -401,7 +395,7 @@ function HeroPill({ icon, label }: { icon: ReactNode; label: string }) {
 
 function HeroMetric({ label, value, helper }: { label: string; value: string; helper: string }) {
   return (
-    <div className="rounded-[24px] border border-[rgba(197,168,255,0.16)] bg-white/[0.045] p-4 backdrop-blur">
+    <div className="clinical-card p-4">
       <p className="metric-label">{label}</p>
       <p className="metric-value mt-2 text-[2.15rem]">{value}</p>
       <p className="mt-1 text-xs leading-5 text-[var(--color-text-tertiary)]">{helper}</p>
@@ -436,9 +430,9 @@ function AlertPanel({
   );
 }
 
-function LoadingConsole({ label = 'Looking for patterns in your data...' }: { label?: string }) {
+function LoadingPanel({ label = 'Looking for repeated overlap in your data...' }: { label?: string }) {
   return (
-    <div className="surface-panel flex h-80 flex-col items-center justify-center gap-4 rounded-[34px]">
+    <div className="clinical-card flex h-80 flex-col items-center justify-center gap-4">
       <div className="insight-orb">
         <Loader2 className="h-5 w-5 animate-spin text-white" />
       </div>
@@ -475,7 +469,7 @@ function EvidenceGapPanel({
             Stronger logging will sharpen future insights
           </h3>
           <p className="mt-3 text-sm leading-6 text-[var(--color-text-secondary)]">
-            GutWise filtered weaker candidates and kept the better-supported signals. These gaps
+            GutWise filtered weaker candidates and kept the better-supported patterns. These gaps
             show what would improve the next ranked pass.
           </p>
           <p className="mt-4 text-sm font-semibold text-[#FFC26A]">
@@ -539,7 +533,7 @@ function EmptyRankedState({
   );
 
   return (
-    <section className="surface-panel rounded-[36px] px-6 py-12 text-center sm:px-10 sm:py-16">
+    <section className="clinical-card px-6 py-12 text-center sm:px-10 sm:py-16">
       <div className="insight-orb mx-auto mb-6">
         <Brain className="h-5 w-5 text-white" />
       </div>
@@ -596,7 +590,7 @@ function LegacyEmptyState({
   onGenerate: () => void;
 }) {
   return (
-    <section className="surface-panel rounded-[36px] px-6 py-12 text-center sm:px-10 sm:py-14">
+    <section className="clinical-card px-6 py-12 text-center sm:px-10 sm:py-14">
       <div className="insight-orb mx-auto mb-6">
         <Brain className="h-5 w-5 text-white" />
       </div>

@@ -54,7 +54,7 @@ export default function BMCountWidget({ count, loading }: BMCountWidgetProps) {
   const StatusIcon = status.icon;
 
   return (
-    <Card variant="elevated" className="transition-all duration-200 hover:-translate-y-px hover:shadow-md dark:hover:shadow-dark-md">
+    <Card variant="elevated">
       <div className="flex items-start justify-between mb-4">
         <div>
           <p className="text-[11px] font-medium text-neutral-muted dark:text-dark-muted mb-1 uppercase tracking-wider">

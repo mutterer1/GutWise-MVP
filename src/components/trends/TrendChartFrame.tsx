@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Activity, Sparkles } from 'lucide-react';
+import { Activity } from 'lucide-react';
 
 export const TREND_CHART_COLORS = {
   primary: '#a78bfa',
@@ -56,8 +56,8 @@ export function TrendChartFrame({
       <div className="relative z-[1] space-y-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-2xl">
-            <span className="signal-badge signal-badge-daily mb-3">
-              <Sparkles className="h-3.5 w-3.5" />
+            <span className="clinical-chip mb-3">
+              <Activity className="h-3.5 w-3.5" />
               {kicker}
             </span>
             <h3 className="text-2xl font-semibold tracking-[-0.04em] text-[var(--color-text-primary)]">
@@ -139,7 +139,7 @@ function ChartLegendChip({ item }: { item: TrendLegendItem }) {
 
 export function ChartEmptyState({ message }: { message: string }) {
   return (
-    <div className="empty-signal-state flex h-64 flex-col items-center justify-center gap-3 px-5 text-center">
+    <div className="flex h-64 flex-col items-center justify-center gap-3 rounded-[var(--gw-radius-card)] border border-[var(--border-subtle)] bg-white/[0.02] px-5 text-center">
       <div className="insight-orb">
         <Activity className="h-5 w-5 text-white" />
       </div>

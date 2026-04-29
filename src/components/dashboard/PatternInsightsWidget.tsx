@@ -1,4 +1,4 @@
-import { Activity, AlertCircle, ArrowRight, Brain, Sparkles, TrendingUp, type LucideIcon } from 'lucide-react';
+import { Activity, AlertCircle, ArrowRight, Brain, TrendingUp, type LucideIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface PatternInsightsWidgetProps {
@@ -35,25 +35,25 @@ function getSignalCount(
 function getProgressState(signalCount: number) {
   if (signalCount === 0) {
     return {
-      label: 'Awaiting signals',
-      headline: "Today's signals are still taking shape.",
-      body: 'A few core entries - movement, water intake, and stress - will help GutWise surface its first observations for today.',
+      label: 'Awaiting inputs',
+      headline: "Today's picture is still taking shape.",
+      body: 'A few core entries - bowel movement, water intake, and stress - help GutWise summarize today without overreaching.',
       cta: "Start with today's first entry",
     };
   }
   if (signalCount === 1) {
     return {
-      label: 'Signal received',
+      label: 'Entry received',
       headline: 'Your daily picture is starting to form.',
-      body: "One signal logged. A few more entries will let GutWise begin connecting today's dots.",
+      body: "One input is logged. A few more entries will make today's observations more useful.",
       cta: "Keep building today's snapshot",
     };
   }
   if (signalCount === 2) {
     return {
-      label: 'Signals building',
+      label: 'Inputs building',
       headline: 'Observations are getting closer.',
-      body: "Two signals in. Log one more area and GutWise will have enough to surface today's first patterns.",
+      body: "Two inputs are logged. One more area gives today's summary better context.",
       cta: "Complete today's picture",
     };
   }
@@ -75,9 +75,9 @@ function generateInsights(
 
   if (hydrationPercentage >= 100) {
     insights.push({
-      icon: Sparkles,
+      icon: Activity,
       title: 'Water goal reached',
-      message: "You've met your daily water target. Consistent water intake can support digestive regularity.",
+      message: 'Water-goal credit is complete for today. Compare this with stool form and symptoms over time.',
       type: 'positive',
       confidence: 'high',
     });
@@ -85,7 +85,7 @@ function generateInsights(
     insights.push({
       icon: TrendingUp,
       title: 'Water goal opportunity',
-      message: 'Your water-goal progress is below target. Increasing plain water intake may improve digestive comfort.',
+      message: 'Water-goal progress is below target. More hydration context may make today easier to interpret.',
       type: 'suggestion',
       confidence: 'medium',
     });
@@ -93,19 +93,19 @@ function generateInsights(
 
   if (symptomsCount === 0 && bmCount > 0) {
     insights.push({
-      icon: Sparkles,
+      icon: Activity,
       title: 'No symptoms reported',
-      message: 'A day without logged symptoms. Your body seems to be responding well today.',
+      message: "No symptoms were logged alongside today's bowel entries.",
       type: 'positive',
-      confidence: 'high',
+      confidence: 'medium',
     });
   }
 
   if (bmCount >= 1 && bmCount <= 3) {
     insights.push({
       icon: TrendingUp,
-      title: 'Healthy frequency',
-      message: 'Your bowel movement frequency is within the typical healthy range for today.',
+      title: 'Typical frequency range',
+      message: "Today's bowel movement count is within a commonly typical range, based on logged entries only.",
       type: 'positive',
       confidence: 'medium',
     });
@@ -114,8 +114,8 @@ function generateInsights(
   if (stressLevel !== null && stressLevel <= 4) {
     insights.push({
       icon: Brain,
-      title: 'Stress levels manageable',
-      message: 'Lower stress can positively influence gut motility and reduce digestive discomfort.',
+      title: 'Lower stress logged',
+      message: 'Stress was logged in a lower range today. Compare this with symptoms and urgency before drawing conclusions.',
       type: 'positive',
       confidence: 'medium',
     });
@@ -123,7 +123,7 @@ function generateInsights(
     insights.push({
       icon: AlertCircle,
       title: 'Higher stress today',
-      message: 'Stress can influence gut motility and discomfort. A short break or relaxation practice may help.',
+      message: 'Higher stress was logged today. Compare it with urgency, stool form, and symptoms before treating it as a pattern.',
       type: 'suggestion',
       confidence: 'high',
     });
@@ -140,7 +140,7 @@ function SignalDots({ count, total = 3 }: { count: number; total?: number }) {
           key={i}
           className={
             i < count
-              ? 'h-2 w-2 rounded-full bg-[var(--gw-intelligence-300)] shadow-[0_0_8px_rgba(167,139,250,0.75)]'
+              ? 'h-2 w-2 rounded-full bg-[var(--gw-intelligence-300)]'
               : 'h-1.5 w-1.5 rounded-full bg-white/10'
           }
         />
@@ -204,7 +204,7 @@ export default function PatternInsightsWidget({
 
   if (loading) {
     return (
-      <div className="signal-card p-6">
+      <div className="clinical-card p-6">
         <div className="animate-pulse space-y-4">
           <div className="flex items-center gap-3">
             <div className="h-11 w-11 flex-shrink-0 rounded-xl bg-white/10" />
@@ -230,50 +230,32 @@ export default function PatternInsightsWidget({
   const hasHighConfidence = insights.some((i) => i.confidence === 'high');
   const hasMediumConfidence = insights.some((i) => i.confidence === 'medium');
   const emphasisClass = hasHighConfidence
-    ? 'signal-card-major animate-signal-pulse'
+    ? 'clinical-priority-card'
     : hasMediumConfidence
-      ? 'signal-card-major'
-      : 'signal-card-daily';
+      ? 'clinical-priority-card'
+      : '';
 
   return (
-    <div className={`major-insight-card p-6 transition-all ${emphasisClass}`}>
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full"
-        style={{
-          background:
-            'radial-gradient(circle, rgba(139,92,246,0.18) 0%, rgba(139,92,246,0.06) 50%, transparent 70%)',
-        }}
-      />
-
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -bottom-10 left-1/2 h-32 w-64 -translate-x-1/2 rounded-full"
-        style={{
-          background: 'radial-gradient(ellipse, rgba(197,168,255,0.09) 0%, transparent 70%)',
-        }}
-      />
-
+    <div className={`clinical-card p-6 transition-all ${emphasisClass}`}>
       <div className="relative">
         <div className="mb-5 flex items-start justify-between gap-4">
           <div className="flex items-center gap-3">
             <div
               className="flex-shrink-0 rounded-xl p-2.5"
               style={{
-                background: 'rgba(139,92,246,0.16)',
-                boxShadow: '0 0 18px rgba(139,92,246,0.26), inset 0 1px 0 rgba(255,255,255,0.08)',
+                background: 'rgba(139,92,246,0.14)',
               }}
             >
               <Brain className="h-5 w-5 text-[var(--gw-intelligence-300)]" />
             </div>
             <div>
               <h3 className="text-h4 font-sora font-semibold leading-tight text-[var(--color-text-primary)]">
-                Live Pattern Scan
+                Today&apos;s observations
               </h3>
               <p className="mt-0.5 text-xs text-[var(--color-text-secondary)]">
                 {hasInsights
-                  ? "Observations based on today's logged signals"
-                  : 'Observations appear as your daily signal map builds'}
+                  ? "Observations based on today's logged entries"
+                  : "Observations appear as today's context builds"}
               </p>
             </div>
           </div>
@@ -297,7 +279,7 @@ export default function PatternInsightsWidget({
             className="rounded-2xl px-5 py-5"
             style={{
               background:
-                'radial-gradient(circle at 18% 30%, rgba(139,92,246,0.13) 0%, rgba(139,92,246,0.06) 22%, rgba(139,92,246,0.03) 55%, transparent 100%), linear-gradient(135deg, rgba(139,92,246,0.08) 0%, rgba(139,92,246,0.03) 60%, transparent 100%)',
+                'linear-gradient(135deg, rgba(139,92,246,0.08) 0%, rgba(139,92,246,0.03) 60%, transparent 100%)',
             }}
           >
             <div className="flex items-start gap-4">
@@ -305,7 +287,6 @@ export default function PatternInsightsWidget({
                 className="mt-0.5 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl"
                 style={{
                   background: 'rgba(139,92,246,0.14)',
-                  boxShadow: '0 0 18px rgba(139,92,246,0.22)',
                 }}
               >
                 <Activity className="text-[var(--gw-intelligence-300)]" style={{ width: '17px', height: '17px' }} />
@@ -339,11 +320,11 @@ export default function PatternInsightsWidget({
         )}
 
         <div className="mt-5 flex items-center gap-2">
-          <Sparkles className="h-3 w-3 flex-shrink-0 text-[var(--gw-intelligence-300)]" />
+          <Activity className="h-3 w-3 flex-shrink-0 text-[var(--gw-intelligence-300)]" />
           <p className="text-xs leading-relaxed text-[var(--color-text-tertiary)]">
             {hasInsights
               ? 'Logging across more categories strengthens pattern detection.'
-              : "The more complete today's picture, the sharper your observations get."}
+              : "The more complete today's picture, the more useful the observations become."}
           </p>
         </div>
       </div>

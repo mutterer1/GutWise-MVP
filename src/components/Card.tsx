@@ -37,7 +37,7 @@ export default function Card({
 
   const variantStyles = {
     elevated:
-      'surface-panel',
+      'clinical-card',
     glass:
       'surface-panel-soft glass-sheen',
     flat:

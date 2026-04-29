@@ -3,7 +3,6 @@ import {
   Activity,
   AlertCircle,
   ArrowRight,
-  Brain,
   ClipboardCheck,
   Droplet,
   Dumbbell,
@@ -14,7 +13,6 @@ import {
   Pill,
   Plus,
   ShieldCheck,
-  Sparkles,
   TrendingUp,
   Utensils,
   Waves,
@@ -148,17 +146,17 @@ function getPrimarySublabel(action: QuickAction, metrics: DashboardMetrics): str
 
 function getReadinessLabel(readiness: number) {
   if (readiness === 0) return 'Initializing';
-  if (readiness < 50) return 'Signal building';
+  if (readiness < 50) return 'Context building';
   if (readiness < 80) return 'Analysis ready';
   if (readiness < 100) return 'High context';
-  return 'Full signal';
+  return 'Complete coverage';
 }
 
 function getReadinessMessage(readiness: number) {
-  if (readiness === 0) return "Start with one entry to activate today's signal map.";
+  if (readiness === 0) return "Start with one entry to activate today's snapshot.";
   if (readiness < 50) return 'Add more core domains before trusting daily patterns.';
   if (readiness < 80) return 'Enough context exists for early pattern review.';
-  if (readiness < 100) return 'Today has strong coverage. One missing signal can sharpen it.';
+  if (readiness < 100) return 'Today has strong coverage. One missing input can sharpen it.';
   return 'Core coverage is complete. Review insights or keep logging context.';
 }
 
@@ -258,12 +256,12 @@ export default function Dashboard() {
   const missingCoreSignal = coreDomains.find((domain) => !domain.logged);
   const nextAction = missingCoreSignal
     ? {
-        title: `Add ${missingCoreSignal.label.toLowerCase()} signal`,
+        title: `Add ${missingCoreSignal.label.toLowerCase()} entry`,
         body: `${missingCoreSignal.detail} is the clearest missing input for today.`,
         path: missingCoreSignal.path,
       }
     : {
-        title: "Review today's intelligence",
+        title: "Review today's patterns",
         body: 'Core coverage is complete. Move into insights or add supporting context.',
         path: '/insights',
       };
@@ -282,26 +280,23 @@ export default function Dashboard() {
             </div>
           )}
 
-          <section className="page-enter intelligence-console p-5 sm:p-6 lg:p-8">
-            <div className="pointer-events-none absolute right-[-8rem] top-[-10rem] h-80 w-80 rounded-full bg-[rgba(139,92,246,0.22)] blur-3xl severity-glow" />
-            <div className="pointer-events-none absolute bottom-[-12rem] left-[-10rem] h-96 w-96 rounded-full bg-[rgba(91,184,240,0.12)] blur-3xl" />
-
-            <div className="relative grid gap-6 xl:grid-cols-[1.42fr_0.88fr]">
-              <div className="flex flex-col justify-between gap-8 lg:min-h-[520px]">
-                <div className="space-y-5">
+          <section className="page-enter clinical-panel p-5 sm:p-6 lg:p-7">
+            <div className="relative grid gap-5 xl:grid-cols-[1.38fr_0.82fr]">
+              <div className="flex flex-col justify-between gap-6">
+                <div className="space-y-4">
                   <div className="flex flex-wrap items-center gap-3">
-                    <span className="signal-badge signal-badge-major">
-                      <Brain className="h-3.5 w-3.5" />
-                      Royal Signal Dashboard
+                    <span className="clinical-chip clinical-chip-intelligence">
+                      <Activity className="h-3.5 w-3.5" />
+                      Today dashboard
                     </span>
-                    <span className="signal-badge signal-badge-daily">
-                      {capturedCoreSignals}/{coreDomains.length} core online
+                    <span className="clinical-chip">
+                      {capturedCoreSignals}/{coreDomains.length} core inputs
                     </span>
                   </div>
 
                   <div className="max-w-4xl">
                     <h1
-                      className="page-title text-[clamp(2.8rem,6vw,5.9rem)]"
+                      className="page-title text-[clamp(2.45rem,5.2vw,4.85rem)]"
                       aria-label="Your health intelligence hub."
                     >
                       <span aria-hidden="true" className="block">
@@ -323,15 +318,15 @@ export default function Dashboard() {
                         hub.
                       </span>
                     </h1>
-                    <p className="page-subtitle mt-4 max-w-3xl text-[clamp(1rem,1.4vw,1.25rem)]">
-                      GutWise is mapping today&apos;s bowel, food, hydration, symptom, sleep, stress,
-                      and medication signals into one operating view.
+                    <p className="page-subtitle mt-4 max-w-3xl">
+                      GutWise brings today&apos;s bowel, food, hydration, symptom, sleep, stress,
+                      and medication entries into one clinical tracking view.
                     </p>
                   </div>
                 </div>
 
                 <div className="grid gap-4 lg:grid-cols-[1fr_0.9fr]">
-                  <div className="signal-card signal-card-major p-5 sm:p-6">
+                  <div className="clinical-card clinical-priority-card p-5 sm:p-6">
                     <div className="mb-5 flex items-start justify-between gap-4">
                       <div>
                         <p className="data-kicker">Next best action</p>
@@ -340,7 +335,7 @@ export default function Dashboard() {
                         </h2>
                       </div>
                       <div className="insight-orb animate-major-signal">
-                        <Sparkles className="h-5 w-5 text-white" />
+                        <ArrowRight className="h-5 w-5 text-white" />
                       </div>
                     </div>
 
@@ -359,13 +354,13 @@ export default function Dashboard() {
                     </div>
                   </div>
 
-                  <div className="rounded-[28px] border border-[rgba(202,190,255,0.16)] bg-white/[0.035] p-5">
+                  <div className="clinical-card p-5">
                     <div className="mb-4 flex items-center gap-3">
                       <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[rgba(139,92,246,0.14)] text-[var(--gw-intelligence-300)]">
                         <ShieldCheck className="h-5 w-5" />
                       </div>
                       <div>
-                        <p className="data-kicker">Pattern posture</p>
+                        <p className="data-kicker">Coverage posture</p>
                         <p className="text-sm font-semibold text-[var(--color-text-primary)]">
                           {readinessLabel}
                         </p>
@@ -378,7 +373,7 @@ export default function Dashboard() {
 
                     <div className="mt-5 grid grid-cols-2 gap-3">
                       <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
-                        <p className="metric-label">Context signals</p>
+                        <p className="metric-label">Context inputs</p>
                         <p className="metric-value mt-2 text-[2.35rem]">
                           {capturedContextSignals}/{contextSignals.length}
                         </p>
@@ -392,11 +387,11 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <aside className="signal-card signal-card-major flex flex-col justify-between gap-6 p-5 sm:p-6">
+              <aside className="clinical-card flex flex-col justify-between gap-6 p-5 sm:p-6">
                 <div className="space-y-5">
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <p className="data-kicker">Signal readiness</p>
+                      <p className="data-kicker">Today&apos;s readiness</p>
                       <h2 className="mt-2 text-2xl font-semibold tracking-[-0.035em] text-[var(--color-text-primary)]">
                         {readinessLabel}
                       </h2>
@@ -435,7 +430,7 @@ export default function Dashboard() {
                           className={[
                             'group flex w-full items-center justify-between gap-3 rounded-2xl border px-3.5 py-3 text-left transition-smooth',
                             domain.logged
-                              ? 'border-[rgba(197,168,255,0.24)] bg-[rgba(139,92,246,0.1)]'
+                              ? 'border-[rgba(197,168,255,0.22)] bg-[rgba(139,92,246,0.075)]'
                               : 'border-white/10 bg-white/[0.025] hover:border-[rgba(197,168,255,0.22)] hover:bg-white/[0.045]',
                           ].join(' ')}
                         >
@@ -483,7 +478,7 @@ export default function Dashboard() {
           />
 
           <section className="card-enter grid gap-4 xl:grid-cols-[0.95fr_1.45fr]">
-            <div className="signal-card p-5 sm:p-6">
+            <div className="clinical-card p-5 sm:p-6">
               <div className="mb-5 flex items-start gap-3">
                 <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[rgba(139,92,246,0.16)] text-[var(--gw-intelligence-300)]">
                   <ClipboardCheck className="h-5 w-5" />
@@ -506,15 +501,15 @@ export default function Dashboard() {
               </Button>
             </div>
 
-            <div className="surface-panel rounded-[32px] p-5 sm:p-6">
+            <div className="clinical-card p-5 sm:p-6">
               <div className="mb-5 flex items-start justify-between gap-4">
                 <div>
-                  <span className="signal-badge signal-badge-daily mb-3">
+                  <span className="clinical-chip mb-3">
                     <Plus className="h-3.5 w-3.5" />
-                    Quick Capture
+                    Quick log
                   </span>
                   <h2 className="text-2xl font-semibold tracking-[-0.035em] text-[var(--color-text-primary)]">
-                    Log one signal without breaking flow.
+                    Log one entry without breaking flow.
                   </h2>
                 </div>
                 <Activity className="hidden h-5 w-5 text-[var(--gw-intelligence-300)] sm:block" />
@@ -560,7 +555,7 @@ export default function Dashboard() {
                             {action.label}
                           </p>
                           <p className="mt-1 text-xs leading-5 text-[var(--color-text-tertiary)]">
-                            {isMissing ? 'Capture missing signal' : 'Add another entry'}
+                            {isMissing ? 'Capture missing input' : 'Add another entry'}
                           </p>
                         </div>
                       </div>
@@ -600,15 +595,15 @@ export default function Dashboard() {
           <section className="space-y-4">
             <div className="page-header pb-1">
               <div>
-                <span className="signal-badge signal-badge-daily mb-3">
+                <span className="clinical-chip mb-3">
                   <TrendingUp className="h-3.5 w-3.5" />
-                  Measured Detail
+                  Measured detail
                 </span>
                 <h2 className="text-3xl font-semibold tracking-[-0.04em] text-[var(--color-text-primary)]">
                   Today&apos;s data layer
                 </h2>
                 <p className="page-subtitle mt-2">
-                  The cockpit summarizes the day. These modules preserve the measured detail
+                  The dashboard summarizes the day. These modules preserve the measured detail
                   behind bowel, hydration, symptom, and medication context.
                 </p>
               </div>

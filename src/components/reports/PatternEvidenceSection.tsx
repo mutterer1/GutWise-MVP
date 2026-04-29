@@ -1,4 +1,4 @@
-import { AlertCircle, FileSearch, ShieldCheck, Sparkles } from 'lucide-react';
+import { AlertCircle, FileSearch, ShieldCheck } from 'lucide-react';
 import type {
   ExplanationInsightItem,
   ExplanationSignalSourceKind,
@@ -55,7 +55,7 @@ const signalSourceConfig: Record<
 const statusLabels: Record<string, string> = {
   reliable: 'Consistent pattern',
   emerging: 'Pattern building',
-  exploratory: 'Tentative signal',
+  exploratory: 'Tentative pattern',
   insufficient: 'Not enough data yet',
 };
 
@@ -236,7 +236,7 @@ export default function PatternEvidenceSection({
   const sourceMix = summarizeSourceMix(items);
 
   return (
-    <section className="mb-5 rounded-[34px] border border-[rgba(197,168,255,0.16)] bg-[rgba(10,13,31,0.64)] p-5 shadow-[0_18px_54px_rgba(5,8,22,0.18)] print:border-gray-300 print:bg-white print:p-6">
+    <section className="clinical-card mb-5 p-5 print:border-gray-300 print:bg-white print:p-6">
       <div className="mb-5 border-b border-[rgba(197,168,255,0.12)] pb-4 print:border-gray-200">
         <p className="mb-1 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--gw-intelligence-300)] print:text-gray-500">
           Pattern Evidence
@@ -334,7 +334,7 @@ export default function PatternEvidenceSection({
 
       <div className="mt-5 rounded-[22px] border border-[rgba(197,168,255,0.14)] bg-white/[0.035] px-4 py-3 print:border-gray-200 print:bg-gray-50">
         <div className="flex items-start gap-3">
-          <Sparkles className="mt-0.5 h-4 w-4 flex-shrink-0 text-[var(--gw-intelligence-300)] print:text-gray-600" />
+          <ShieldCheck className="mt-0.5 h-4 w-4 flex-shrink-0 text-[var(--gw-intelligence-300)] print:text-gray-600" />
           <p className="text-xs leading-5 text-[var(--color-text-secondary)] print:text-gray-700">
             Report exports should preserve the difference between reviewed evidence and fallback
             heuristics. That helps keep the clinical conversation grounded in what GutWise actually

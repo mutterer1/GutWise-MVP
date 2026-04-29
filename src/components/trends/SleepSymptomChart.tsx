@@ -58,7 +58,7 @@ export default function SleepSymptomChart({ data }: SleepSymptomChartProps) {
         { label: 'Sleep hours', color: TREND_CHART_COLORS.blue, variant: 'bar' },
         { label: 'Symptom pressure', color: TREND_CHART_COLORS.rose, variant: 'bar' },
       ]}
-      insight="The clearest recovery signal is symptom pressure repeatedly rising after shorter or lower-quality sleep."
+      insight="The clearest recovery pattern is symptom pressure repeatedly rising after shorter or lower-quality sleep."
     >
       <div className="chart-plot-area h-[326px] px-3 pb-12 pt-8">
         <div className="absolute inset-x-4 top-1/2 z-[1] border-t border-dashed border-[rgba(216,199,255,0.28)]">
@@ -79,21 +79,21 @@ export default function SleepSymptomChart({ data }: SleepSymptomChartProps) {
               <div key={item.date} className="group relative h-full flex-1">
                 {item.sleepHours !== null && (
                   <div
-                    className="absolute bottom-1/2 left-[18%] right-[18%] rounded-t-[18px] bg-[linear-gradient(180deg,var(--gw-brand-200),var(--gw-brand-600))] shadow-[0_0_24px_rgba(91,184,240,0.24)] transition-smooth group-hover:shadow-[0_0_36px_rgba(91,184,240,0.38)]"
+                    className="absolute bottom-1/2 left-[18%] right-[18%] rounded-t-[18px] bg-[linear-gradient(180deg,var(--gw-brand-200),var(--gw-brand-600))] transition-smooth"
                     style={{ height: `${Math.max(sleepHeight, 5)}%` }}
                   />
                 )}
 
                 {item.avgSymptomSeverity !== null && (
                   <div
-                    className="absolute left-[18%] right-[18%] top-1/2 rounded-b-[18px] bg-[linear-gradient(180deg,var(--gw-rose-400),var(--gw-rose-700))] shadow-[0_0_24px_rgba(240,111,155,0.24)] transition-smooth group-hover:shadow-[0_0_36px_rgba(240,111,155,0.36)]"
+                    className="absolute left-[18%] right-[18%] top-1/2 rounded-b-[18px] bg-[linear-gradient(180deg,var(--gw-rose-400),var(--gw-rose-700))] transition-smooth"
                     style={{ height: `${Math.max(symptomHeight, 5)}%` }}
                   />
                 )}
 
                 {item.sleepQuality !== null && (
                   <div
-                    className="absolute left-1/2 z-[2] h-3 w-3 -translate-x-1/2 rounded-full border border-white/70 bg-[var(--gw-intelligence-200)] shadow-[0_0_18px_rgba(197,168,255,0.36)]"
+                    className="absolute left-1/2 z-[2] h-3 w-3 -translate-x-1/2 rounded-full border border-white/70 bg-[var(--gw-intelligence-200)]"
                     style={{ bottom: `${50 + Math.min((item.sleepQuality / 10) * 40, 40)}%` }}
                   />
                 )}

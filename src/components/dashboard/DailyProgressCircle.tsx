@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-interface Signal {
+interface ProgressSegment {
   label: string;
   logged: boolean;
   color: string;
@@ -32,7 +32,7 @@ export default function DailyProgressCircle({
   const RADIUS = (size - stroke) / 2;
   const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
-  const signals: Signal[] = useMemo(
+  const segments: ProgressSegment[] = useMemo(
     () => [
       { label: 'BM', logged: bmLogged, color: '#A78BFA', trackColor: 'rgba(167, 139, 250, 0.12)' },
       { label: 'Food', logged: foodLogged, color: '#C084FC', trackColor: 'rgba(192, 132, 252, 0.12)' },
@@ -43,11 +43,11 @@ export default function DailyProgressCircle({
     [bmLogged, foodLogged, hydrationLogged, sleepLogged, symptomsLogged]
   );
 
-  const loggedCount = signals.filter((s) => s.logged).length;
-  const totalSignals = signals.length;
-  const totalGapDegrees = GAP_ANGLE * totalSignals;
+  const loggedCount = segments.filter((segment) => segment.logged).length;
+  const totalSegments = segments.length;
+  const totalGapDegrees = GAP_ANGLE * totalSegments;
   const availableDegrees = TOTAL_DEGREES - totalGapDegrees;
-  const segmentDegrees = availableDegrees / totalSignals;
+  const segmentDegrees = availableDegrees / totalSegments;
   const segmentLength = (segmentDegrees / 360) * CIRCUMFERENCE;
 
   const countFontSize = Math.round(size * 0.22);
@@ -60,21 +60,21 @@ export default function DailyProgressCircle({
         height={size}
         viewBox={`0 0 ${size} ${size}`}
         className="transform -rotate-90"
-        aria-label={`${loggedCount} of ${totalSignals} signals logged`}
+        aria-label={`${loggedCount} of ${totalSegments} core inputs logged`}
         role="img"
       >
-        {signals.map((signal, i) => {
+        {segments.map((segment, i) => {
           const startDegree = i * (segmentDegrees + GAP_ANGLE);
           const startOffset = (startDegree / 360) * CIRCUMFERENCE;
 
           return (
-            <g key={signal.label}>
+            <g key={segment.label}>
               <circle
                 cx={size / 2}
                 cy={size / 2}
                 r={RADIUS}
                 fill="none"
-                stroke={signal.trackColor}
+                stroke={segment.trackColor}
                 strokeWidth={stroke}
                 strokeDasharray={`${segmentLength} ${CIRCUMFERENCE - segmentLength}`}
                 strokeDashoffset={-startOffset}
@@ -85,7 +85,7 @@ export default function DailyProgressCircle({
                 cy={size / 2}
                 r={RADIUS}
                 fill="none"
-                stroke={signal.logged ? signal.color : 'transparent'}
+                stroke={segment.logged ? segment.color : 'transparent'}
                 strokeWidth={stroke}
                 strokeDasharray={`${segmentLength} ${CIRCUMFERENCE - segmentLength}`}
                 strokeDashoffset={-startOffset}
@@ -93,7 +93,7 @@ export default function DailyProgressCircle({
                 className="progress-arc-segment"
                 style={{
                   transition: 'stroke 0.6s ease-out, opacity 0.6s ease-out',
-                  opacity: signal.logged ? 1 : 0,
+                  opacity: segment.logged ? 1 : 0,
                   filter: 'none',
                 }}
               />
@@ -112,7 +112,7 @@ export default function DailyProgressCircle({
           className="text-[var(--color-text-tertiary)] leading-none mt-1"
           style={{ fontSize: labelFontSize }}
         >
-          of {totalSignals}
+          of {totalSegments}
         </span>
       </div>
     </div>

@@ -77,7 +77,7 @@ export default function BMFrequencyChart({ data }: BMFrequencyChartProps) {
                       'relative min-h-[6px] w-full overflow-hidden rounded-t-[18px] transition-smooth',
                       inactive
                         ? 'bg-white/[0.06]'
-                        : 'bg-[linear-gradient(180deg,var(--gw-intelligence-200),var(--gw-intelligence-600))] shadow-[0_0_26px_rgba(167,139,250,0.3)] group-hover:shadow-[0_0_38px_rgba(197,168,255,0.44)]',
+                        : 'bg-[linear-gradient(180deg,var(--gw-intelligence-200),var(--gw-intelligence-600))]',
                     ].join(' ')}
                     style={{ height: `${inactive ? 5 : Math.max(heightPercent, 8)}%` }}
                   >
@@ -88,7 +88,7 @@ export default function BMFrequencyChart({ data }: BMFrequencyChartProps) {
 
                   {!inactive && (
                     <div
-                      className="absolute left-1/2 h-2.5 w-2.5 -translate-x-1/2 rounded-full bg-[var(--gw-rose-300)] shadow-[0_0_18px_rgba(240,111,155,0.48)]"
+                      className="absolute left-1/2 h-2.5 w-2.5 -translate-x-1/2 rounded-full bg-[var(--gw-rose-300)]"
                       style={{ bottom: `${Math.max(heightPercent, 8)}%` }}
                     />
                   )}

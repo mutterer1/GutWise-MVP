@@ -361,10 +361,10 @@ export default function QuickLogAgainWidget() {
   };
 
   return (
-    <section className="card-enter surface-panel rounded-[28px] p-4 sm:rounded-[32px] sm:p-6 lg:p-7">
+    <section className="card-enter clinical-card p-4 sm:p-6 lg:p-7">
       <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <span className="badge-secondary mb-3 inline-flex">Reuse</span>
+          <span className="clinical-chip mb-3">Reuse</span>
           <h2 className="text-[clamp(1.45rem,2vw,1.75rem)] font-semibold tracking-[-0.03em] text-[var(--color-text-primary)]">
             Quick log again
           </h2>
@@ -375,7 +375,7 @@ export default function QuickLogAgainWidget() {
 
         <div className="flex flex-wrap items-center gap-2 sm:justify-end">
           {lastLoadedAt && (
-            <span className="rounded-full border border-white/8 bg-white/[0.03] px-3 py-1.5 text-[11px] font-medium text-[var(--color-text-tertiary)]">
+            <span className="clinical-chip">
               Updated {formatLoadedAt(lastLoadedAt)}
             </span>
           )}
@@ -413,7 +413,7 @@ export default function QuickLogAgainWidget() {
           {[0, 1, 2].map((item) => (
             <div
               key={item}
-              className="min-h-[154px] animate-pulse rounded-[24px] border border-white/8 bg-white/[0.03]"
+              className="min-h-[154px] animate-pulse rounded-[24px] border border-white/8 bg-white/[0.025]"
             />
           ))}
         </div>
@@ -430,7 +430,7 @@ export default function QuickLogAgainWidget() {
             return (
               <article
                 key={template.key}
-                className="rounded-[24px] border border-white/8 bg-white/[0.03] p-4 transition-smooth hover:border-[rgba(143,128,246,0.24)] hover:bg-white/[0.045]"
+                className="rounded-[24px] border border-[rgba(202,190,255,0.12)] bg-white/[0.03] p-4 transition-smooth hover:border-[rgba(202,190,255,0.22)] hover:bg-white/[0.045]"
               >
                 <div className="mb-4 flex items-start justify-between gap-3">
                   <div className="flex items-start gap-3">
@@ -447,7 +447,7 @@ export default function QuickLogAgainWidget() {
                     </div>
                   </div>
 
-                  <span className="shrink-0 rounded-full border border-white/8 bg-white/[0.03] px-2.5 py-1 text-[11px] text-[var(--color-text-tertiary)]">
+                  <span className="clinical-chip shrink-0">
                     {formatLoggedAt(template.timestamp)}
                   </span>
                 </div>

@@ -30,7 +30,7 @@ export default function SymptomIntensityChart({ data }: SymptomIntensityChartPro
   if (data.length === 0) {
     return (
       <TrendChartFrame
-        kicker="Symptom Signals"
+        kicker="Symptom pattern"
         title="Symptom Intensity Over Time"
         description="Average symptom severity by day and symptom type."
       >
@@ -67,7 +67,7 @@ export default function SymptomIntensityChart({ data }: SymptomIntensityChartPro
 
   return (
     <TrendChartFrame
-      kicker="Symptom Signals"
+      kicker="Symptom pattern"
       title="Symptom Heatmap"
       description="A pressure map makes repeated symptom timing easier to scan than overlapping lines."
       metric={avgSeverity.toFixed(1)}
@@ -77,7 +77,7 @@ export default function SymptomIntensityChart({ data }: SymptomIntensityChartPro
         color: getSymptomColor(symptom),
         variant: 'dot',
       }))}
-      insight={`Peak signal: ${peak.symptomType} at ${peak.avgSeverity.toFixed(1)}/10 on ${formatTrendDate(peak.date)}.`}
+      insight={`Peak logged severity: ${peak.symptomType} at ${peak.avgSeverity.toFixed(1)}/10 on ${formatTrendDate(peak.date)}.`}
     >
       <div className="chart-plot-area overflow-x-auto px-4 py-5">
         <div className="min-w-[720px] space-y-3">

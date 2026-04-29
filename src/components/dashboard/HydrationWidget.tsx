@@ -60,10 +60,7 @@ export default function HydrationWidget({
   };
 
   return (
-    <Card
-      variant="elevated"
-      className="transition-all duration-200 hover:-translate-y-px hover:shadow-md dark:hover:shadow-dark-md"
-    >
+    <Card variant="elevated">
       <div className="mb-4 flex items-start justify-between">
         <div>
           <p className="mb-1 text-[11px] font-medium uppercase tracking-wider text-neutral-muted dark:text-dark-muted">

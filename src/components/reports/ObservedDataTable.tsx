@@ -20,7 +20,7 @@ export default function ObservedDataTable({
   }
 
   return (
-    <section className="mb-5 rounded-[30px] border border-[rgba(197,168,255,0.16)] bg-[rgba(10,13,31,0.62)] p-5 shadow-[0_18px_54px_rgba(5,8,22,0.18)] print:border-gray-300 print:bg-white print:p-6">
+    <section className="clinical-card mb-5 p-5 print:border-gray-300 print:bg-white print:p-6">
       <div className="mb-5 border-b border-[rgba(197,168,255,0.12)] pb-4 print:border-gray-200">
         <p className="mb-1 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--gw-intelligence-300)] print:text-gray-500">
           Observed Data Summary

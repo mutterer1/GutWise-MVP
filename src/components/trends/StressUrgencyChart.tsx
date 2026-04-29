@@ -74,7 +74,7 @@ export default function StressUrgencyChart({ data }: StressUrgencyChartProps) {
         { label: 'Urgency trace', color: TREND_CHART_COLORS.amber, variant: 'line' },
         { label: 'Event count', color: TREND_CHART_COLORS.rose, variant: 'dot' },
       ]}
-      insight="A meaningful stress response signal is repeated co-movement between stress towers and urgency nodes."
+      insight="A meaningful stress response pattern is repeated co-movement between stress towers and urgency nodes."
     >
       <div className="chart-plot-area h-[340px] px-5 pb-12 pt-6">
         <svg

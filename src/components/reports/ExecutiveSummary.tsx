@@ -24,11 +24,11 @@ export default function ExecutiveSummary({
   const totalFlagged = criticalAlerts.length + primaryConcerns.length;
 
   return (
-    <section className="mb-5 overflow-hidden rounded-[34px] border border-[rgba(197,168,255,0.18)] bg-[rgba(10,13,31,0.72)] p-5 shadow-[0_18px_60px_rgba(5,8,22,0.22)] print:border-gray-300 print:bg-white print:p-6">
+    <section className="clinical-card mb-5 overflow-hidden p-5 print:border-gray-300 print:bg-white print:p-6">
       <div className="mb-6 border-b border-[rgba(197,168,255,0.12)] pb-5 print:border-gray-200">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
-            <span className="signal-badge signal-badge-major mb-3 print:border-gray-300 print:bg-gray-100 print:text-gray-700">
+            <span className="clinical-chip clinical-chip-intelligence mb-3 print:border-gray-300 print:bg-gray-100 print:text-gray-700">
               <FileText className="h-3.5 w-3.5" />
               Report Overview
             </span>

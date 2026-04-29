@@ -6,7 +6,6 @@ import {
   ChevronUp,
   Database,
   ShieldCheck,
-  Sparkles,
 } from 'lucide-react';
 import type { MedicalContextAnnotatedCandidate } from '../../types/insightCandidates';
 import type {
@@ -50,24 +49,24 @@ const patternTypeConfig: Record<PatternType, { label: string; description: strin
   },
   episodic: {
     label: 'Episode pattern',
-    description: 'Signal appears across a flare or recovery window.',
+    description: 'Pattern appears across a flare or recovery window.',
   },
   recurring: {
     label: 'Recurring pattern',
-    description: 'Repeated signal across a longer cycle or rolling window.',
+    description: 'Repeated pattern across a longer cycle or rolling window.',
   },
 };
 
 const tierFrame: Record<string, string> = {
-  high: 'border-[rgba(197,168,255,0.28)] shadow-[0_18px_52px_rgba(104,70,230,0.11)]',
-  medium: 'border-[rgba(197,168,255,0.2)] shadow-[0_16px_44px_rgba(104,70,230,0.08)]',
-  low: 'border-[rgba(197,168,255,0.12)] shadow-[0_14px_38px_rgba(5,8,22,0.18)]',
+  high: 'border-[rgba(197,168,255,0.26)] shadow-[0_16px_42px_rgba(104,70,230,0.09)]',
+  medium: 'border-[rgba(197,168,255,0.18)] shadow-[var(--gw-shadow-dark-xs)]',
+  low: 'border-[rgba(197,168,255,0.12)] shadow-[var(--gw-shadow-dark-xs)]',
 };
 
 const tierLabel: Record<string, string> = {
-  high: 'Strong signal',
-  medium: 'Moderate signal',
-  low: 'Weak signal',
+  high: 'High-priority pattern',
+  medium: 'Moderate pattern',
+  low: 'Early pattern',
 };
 
 const subtypeLabels: Record<string, string> = {
@@ -131,7 +130,7 @@ const statusConfig: Record<
     textClass: 'text-[var(--gw-intelligence-300)]',
   },
   exploratory: {
-    label: 'Tentative signal',
+    label: 'Tentative pattern',
     dotClass: 'bg-[var(--color-text-tertiary)]',
     textClass: 'text-[var(--color-text-tertiary)]',
     tentative: true,
@@ -229,7 +228,7 @@ function buildSignalSourceCaution(source: ExplanationSignalSourceSummary): strin
     source.nutrition_coverage_ratio < 0.65 &&
     source.structured_food_coverage_ratio < 0.65
   ) {
-    return 'Structured coverage is still partial here. Accepting more reviewed foods with nutrition and ingredient detail would strengthen this signal.';
+    return 'Structured coverage is still partial here. Accepting more reviewed foods with nutrition and ingredient detail would strengthen this pattern.';
   }
 
   if (source.nutrition_confidence !== null && source.nutrition_confidence < 0.6) {
@@ -277,13 +276,13 @@ export default function RankedCandidateCard({
 
   return (
     <article
-      className={`group relative overflow-hidden rounded-[34px] border bg-[rgba(10,13,31,0.76)] p-5 transition-smooth hover:-translate-y-0.5 hover:bg-[rgba(12,15,36,0.86)] ${
+      className={`group relative overflow-hidden rounded-[34px] border bg-[rgba(10,13,31,0.76)] p-5 transition-smooth hover:bg-[rgba(12,15,36,0.84)] ${
         tierFrame[candidate.priority_tier] ?? tierFrame.low
       }`}
     >
-      <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-[rgba(197,168,255,0.65)] to-transparent" />
-      <div className="pointer-events-none absolute -right-12 -top-16 h-44 w-44 rounded-full bg-[rgba(139,92,246,0.09)] blur-3xl transition-smooth group-hover:bg-[rgba(139,92,246,0.14)]" />
-      <div className="pointer-events-none absolute -bottom-20 left-8 h-40 w-40 rounded-full bg-[rgba(91,184,240,0.05)] blur-3xl" />
+      {candidate.priority_tier === 'high' && (
+        <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-[rgba(197,168,255,0.45)] to-transparent" />
+      )}
 
       <div className="relative mb-5 flex flex-wrap items-start justify-between gap-4">
         <div className="flex min-w-0 items-start gap-4">
@@ -293,8 +292,8 @@ export default function RankedCandidateCard({
 
           <div className="min-w-0">
             <div className="mb-3 flex flex-wrap items-center gap-2">
-              <span className="signal-badge signal-badge-major">{patternMeta.label}</span>
-              <span className="signal-badge signal-badge-daily">{categoryLabel}</span>
+              <span className="clinical-chip clinical-chip-intelligence">{patternMeta.label}</span>
+              <span className="clinical-chip">{categoryLabel}</span>
               {signalSource && (
                 <span className="rounded-full border border-[rgba(197,168,255,0.18)] bg-white/[0.035] px-3 py-1 text-xs font-semibold text-[var(--color-text-secondary)]">
                   {signalSourceLabel[signalSource.kind]}
@@ -309,7 +308,7 @@ export default function RankedCandidateCard({
         </div>
 
         <span className="shrink-0 rounded-full border border-[rgba(197,168,255,0.22)] bg-[rgba(139,92,246,0.12)] px-3 py-1 text-xs font-semibold text-[var(--gw-intelligence-300)]">
-          {tierLabel[candidate.priority_tier] ?? 'Weak signal'}
+          {tierLabel[candidate.priority_tier] ?? 'Early pattern'}
         </span>
       </div>
 
@@ -346,7 +345,7 @@ export default function RankedCandidateCard({
 
       {status.tentative && (
         <p className="relative mt-3 text-xs leading-5 text-[var(--color-text-tertiary)]">
-          This signal is still building. More consistent overlap across your logs will help confirm
+          This pattern is still building. More consistent overlap across your logs will help confirm
           or rule it out.
         </p>
       )}
@@ -494,7 +493,7 @@ export default function RankedCandidateCard({
             {candidate.ranking_reasons.length > 0 && (
               <div className="mt-5">
                 <p className="mb-1 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-text-tertiary)]">
-                  Ranking signals
+                  Ranking factors
                 </p>
                 <p className="text-xs leading-5 text-[var(--color-text-tertiary)]">
                   {candidate.ranking_reasons.join(' / ')}
@@ -508,7 +507,7 @@ export default function RankedCandidateCard({
       {explanation && (
         <div className="relative mt-5 space-y-4 border-t border-[rgba(197,168,255,0.14)] pt-5">
           <div className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-[var(--gw-intelligence-300)]" />
+            <ShieldCheck className="h-4 w-4 text-[var(--gw-intelligence-300)]" />
             <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--gw-intelligence-300)]">
               Pattern explanation
             </span>

@@ -271,6 +271,16 @@
     box-shadow: var(--gw-shadow-dark-xs);
   }
 
+  .clinical-priority-card {
+    border-color: rgba(197, 168, 255, 0.24);
+    background:
+      radial-gradient(circle at 12% 0%, rgba(139, 92, 246, 0.08), transparent 34%),
+      color-mix(in srgb, var(--surface) 94%, transparent);
+    box-shadow:
+      var(--gw-shadow-dark-sm),
+      0 0 32px rgba(139, 92, 246, 0.08);
+  }
+
   .clinical-chip {
     display: inline-flex;
     min-height: 28px;
@@ -786,13 +796,9 @@
     border-radius: var(--gw-radius-page);
     border: 1px solid rgba(202, 190, 255, 0.12);
     background:
-      radial-gradient(circle at 12% 0%, rgba(216, 199, 255, 0.035), transparent 30%),
-      radial-gradient(circle at 90% 12%, rgba(91, 184, 240, 0.03), transparent 28%),
-      radial-gradient(circle at 78% 92%, rgba(240, 111, 155, 0.02), transparent 30%),
-      linear-gradient(180deg, rgba(20, 16, 52, 0.96), rgba(7, 10, 24, 0.96));
-    box-shadow:
-      var(--gw-shadow-dark-md),
-      var(--gw-glow-intelligence-soft);
+      linear-gradient(180deg, rgba(255, 255, 255, 0.032), rgba(255, 255, 255, 0.012)),
+      color-mix(in srgb, var(--surface) 94%, transparent);
+    box-shadow: var(--gw-shadow-dark-xs);
     isolation: isolate;
   }
 
@@ -808,24 +814,7 @@
   }
 
   .chart-shell::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: -36%;
-    width: 18%;
-    pointer-events: none;
-    z-index: 0;
-    background: linear-gradient(
-      110deg,
-      transparent 10%,
-      rgba(216, 199, 255, 0.01) 38%,
-      rgba(216, 199, 255, 0.028) 50%,
-      rgba(91, 184, 240, 0.018) 62%,
-      transparent 90%
-    );
-    opacity: 0.24;
-    animation: signalSweep 8.5s ease-in-out infinite;
+    display: none;
   }
 
   .chart-legend-chip {
@@ -1088,7 +1077,7 @@
     box-shadow: var(--gw-shadow-dark-md);
   }
 
-  .signal-rank {
+  .step-rank {
     font-family: var(--gw-font-mono);
     font-size: var(--gw-font-size-xs);
     font-weight: 700;
@@ -1310,17 +1299,15 @@
 
   @media (hover: hover) and (pointer: fine) {
     .motion-card:hover {
-      transform: translateY(var(--gw-motion-hover-lift));
+      transform: translateY(-1px);
       border-color: rgba(197, 168, 255, 0.18);
-      box-shadow:
-        var(--gw-shadow-dark-sm),
-        0 0 14px rgba(139, 92, 246, 0.035);
+      box-shadow: var(--gw-shadow-dark-xs);
     }
 
     .motion-card:hover .motion-card-icon {
-      transform: translateY(-1px) scale(1.02);
+      transform: translateY(-1px);
       color: var(--gw-intelligence-100);
-      box-shadow: 0 0 10px rgba(139, 92, 246, 0.04);
+      box-shadow: none;
     }
 
     .motion-control:hover:not(:disabled) {
