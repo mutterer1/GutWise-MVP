@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 
-type GlowIntensity = 'subtle' | 'medium' | 'bright';
+type GlowIntensity = 'none' | 'subtle' | 'medium' | 'bright';
 
 interface CardProps {
   children: ReactNode;
@@ -25,12 +25,14 @@ export default function Card({
   };
 
   const discoveryIntensityStyles = {
+    none:
+      'border-[rgba(143,128,246,0.08)] shadow-[var(--gw-shadow-dark-xs)]',
     subtle:
       'border-[rgba(143,128,246,0.10)] shadow-[var(--gw-glow-intelligence-soft)]',
     medium:
-      'border-[rgba(143,128,246,0.18)] shadow-[0_0_0_1px_rgba(143,128,246,0.12),0_22px_56px_rgba(115,83,230,0.18)]',
+      'border-[rgba(143,128,246,0.14)] shadow-[0_0_0_1px_rgba(143,128,246,0.08),0_18px_42px_rgba(115,83,230,0.12)]',
     bright:
-      'border-[rgba(143,128,246,0.24)] shadow-[0_0_0_1px_rgba(143,128,246,0.18),0_28px_72px_rgba(115,83,230,0.24)]',
+      'border-[rgba(143,128,246,0.18)] shadow-[0_0_0_1px_rgba(143,128,246,0.12),0_22px_56px_rgba(115,83,230,0.16)]',
   };
 
   const variantStyles = {

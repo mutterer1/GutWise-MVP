@@ -59,9 +59,9 @@ const patternTypeConfig: Record<PatternType, { label: string; description: strin
 };
 
 const tierFrame: Record<string, string> = {
-  high: 'border-[rgba(197,168,255,0.34)] shadow-[0_24px_80px_rgba(104,70,230,0.2)]',
-  medium: 'border-[rgba(197,168,255,0.24)] shadow-[0_20px_64px_rgba(104,70,230,0.14)]',
-  low: 'border-[rgba(197,168,255,0.14)] shadow-[0_18px_54px_rgba(5,8,22,0.2)]',
+  high: 'border-[rgba(197,168,255,0.28)] shadow-[0_18px_52px_rgba(104,70,230,0.11)]',
+  medium: 'border-[rgba(197,168,255,0.2)] shadow-[0_16px_44px_rgba(104,70,230,0.08)]',
+  low: 'border-[rgba(197,168,255,0.12)] shadow-[0_14px_38px_rgba(5,8,22,0.18)]',
 };
 
 const tierLabel: Record<string, string> = {
@@ -281,12 +281,12 @@ export default function RankedCandidateCard({
       }`}
     >
       <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-[rgba(197,168,255,0.65)] to-transparent" />
-      <div className="pointer-events-none absolute -right-12 -top-16 h-44 w-44 rounded-full bg-[rgba(139,92,246,0.16)] blur-3xl transition-smooth group-hover:bg-[rgba(139,92,246,0.24)]" />
-      <div className="pointer-events-none absolute -bottom-20 left-8 h-40 w-40 rounded-full bg-[rgba(91,184,240,0.08)] blur-3xl" />
+      <div className="pointer-events-none absolute -right-12 -top-16 h-44 w-44 rounded-full bg-[rgba(139,92,246,0.09)] blur-3xl transition-smooth group-hover:bg-[rgba(139,92,246,0.14)]" />
+      <div className="pointer-events-none absolute -bottom-20 left-8 h-40 w-40 rounded-full bg-[rgba(91,184,240,0.05)] blur-3xl" />
 
       <div className="relative mb-5 flex flex-wrap items-start justify-between gap-4">
         <div className="flex min-w-0 items-start gap-4">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-[rgba(197,168,255,0.2)] bg-[rgba(139,92,246,0.16)] font-mono text-sm font-bold text-[var(--gw-intelligence-200)] shadow-[0_0_24px_rgba(139,92,246,0.16)]">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-[rgba(197,168,255,0.16)] bg-[rgba(139,92,246,0.12)] font-mono text-sm font-bold text-[var(--gw-intelligence-200)] shadow-[0_0_16px_rgba(139,92,246,0.08)]">
             {String(rank).padStart(2, '0')}
           </div>
 

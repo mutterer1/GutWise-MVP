@@ -169,14 +169,14 @@ export default function Insights() {
         data-insight-source={insightSource}
         data-explanation-origin={explanationOrigin}
       >
-        <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[34rem] bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,rgba(139,92,246,0.24)_0%,rgba(91,184,240,0.10)_38%,transparent_78%)]" />
-        <div className="pointer-events-none absolute right-[-10rem] top-36 h-80 w-80 rounded-full bg-[rgba(197,168,255,0.12)] blur-3xl" />
-        <div className="pointer-events-none absolute left-[-8rem] top-[28rem] h-72 w-72 rounded-full bg-[rgba(91,184,240,0.08)] blur-3xl" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[34rem] bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,rgba(139,92,246,0.14)_0%,rgba(91,184,240,0.06)_38%,transparent_78%)]" />
+        <div className="pointer-events-none absolute right-[-10rem] top-36 h-80 w-80 rounded-full bg-[rgba(197,168,255,0.07)] blur-3xl" />
+        <div className="pointer-events-none absolute left-[-8rem] top-[28rem] h-72 w-72 rounded-full bg-[rgba(91,184,240,0.05)] blur-3xl" />
 
         <div className="relative z-10 mx-auto max-w-7xl space-y-6">
-          <section className="page-enter relative overflow-hidden rounded-[38px] border border-[rgba(197,168,255,0.18)] bg-[linear-gradient(135deg,rgba(13,16,38,0.9),rgba(32,22,61,0.82))] p-5 shadow-[0_28px_90px_rgba(6,8,24,0.34)] sm:p-7 lg:p-8">
+          <section className="page-enter relative overflow-hidden rounded-[38px] border border-[rgba(197,168,255,0.14)] bg-[linear-gradient(135deg,rgba(13,16,38,0.92),rgba(28,21,54,0.82))] p-5 shadow-[0_24px_64px_rgba(6,8,24,0.3)] sm:p-7 lg:p-8">
             <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-[rgba(197,168,255,0.65)] to-transparent" />
-            <div className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-[rgba(139,92,246,0.22)] blur-3xl" />
+            <div className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-[rgba(139,92,246,0.12)] blur-3xl" />
 
             <div className="relative grid gap-8 lg:grid-cols-[1.18fr_0.82fr] lg:items-end">
               <div>
