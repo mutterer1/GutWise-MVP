@@ -7,7 +7,10 @@
 
 @layer base {
   html {
+    width: 100%;
     min-height: 100%;
+    overflow-x: hidden;
+    overscroll-behavior: none;
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -17,8 +20,11 @@
   }
 
   body {
+    width: 100%;
     min-height: 100vh;
     margin: 0;
+    overflow-x: hidden;
+    overscroll-behavior: none;
     font-family: var(--gw-font-body);
     font-size: var(--gw-font-size-md);
     line-height: 1.6;
@@ -30,7 +36,10 @@
   }
 
   #root {
+    width: 100%;
     min-height: 100vh;
+    overflow-x: hidden;
+    overscroll-behavior: none;
   }
 
   * {
@@ -179,7 +188,11 @@
   }
 
   .page-shell {
+    width: 100%;
+    min-width: 0;
     min-height: 100vh;
+    overflow-x: clip;
+    overscroll-behavior: none;
     background:
       radial-gradient(circle at top left, rgba(91, 184, 240, 0.045), transparent 25%),
       radial-gradient(circle at 84% 18%, rgba(139, 92, 246, 0.06), transparent 22%),
