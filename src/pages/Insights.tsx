@@ -530,6 +530,14 @@ function EmptyRankedState({
     missing_log_types: string[];
   }>;
 }) {
+  const uniqueEvidenceGapReasons = Array.from(
+    new Set(
+      evidenceGapSummaries
+        .map((summary) => summary.reasons[0]?.trim())
+        .filter((reason): reason is string => Boolean(reason))
+    )
+  );
+
   return (
     <section className="surface-panel rounded-[36px] px-6 py-12 text-center sm:px-10 sm:py-16">
       <div className="insight-orb mx-auto mb-6">
@@ -558,18 +566,18 @@ function EmptyRankedState({
           </p>
         )}
 
-        {evidenceGapSummaries.length > 0 && (
+        {uniqueEvidenceGapReasons.length > 0 && (
           <div className="mx-auto mt-6 max-w-[760px] rounded-[26px] border border-[rgba(255,170,92,0.18)] bg-[rgba(255,170,92,0.07)] px-5 py-5 text-left">
             <p className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#FFC26A]">
               What is missing
             </p>
             <div className="space-y-3">
-              {evidenceGapSummaries.slice(0, 3).map((summary) => (
+              {uniqueEvidenceGapReasons.slice(0, 3).map((reason) => (
                 <p
-                  key={summary.insight_key}
+                  key={reason}
                   className="text-sm leading-7 text-[var(--color-text-secondary)]"
                 >
-                  {summary.reasons[0]}
+                  {reason}
                 </p>
               ))}
             </div>
