@@ -79,20 +79,22 @@ export default function BristolDistributionChart({ data }: BristolDistributionCh
       insight="The useful signal is the cluster shape. A balanced middle cluster is different from a split hard-and-loose pattern."
     >
       <div className="chart-plot-area px-4 py-5">
-        <div className="grid gap-3 sm:grid-cols-7">
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(92px,1fr))] gap-3">
           {data.map((item) => {
             const isIdeal = item.type === 3 || item.type === 4;
-            const size = 44 + Math.round((item.percentage / peakPercentage) * 42);
+            const size = 40 + Math.round((item.percentage / peakPercentage) * 34);
 
             return (
               <div
                 key={item.type}
                 className={[
-                  'group relative flex min-h-[178px] flex-col items-center justify-between rounded-[24px] border px-2 py-4 text-center transition-smooth',
+                  'group relative flex min-h-[148px] flex-col items-center justify-center gap-3 rounded-[22px] border px-2.5 py-3 text-center transition-smooth',
                   isIdeal
                     ? 'border-[rgba(216,199,255,0.28)] bg-[rgba(139,92,246,0.12)]'
                     : 'border-[rgba(202,190,255,0.1)] bg-white/[0.025]',
                 ].join(' ')}
+                role="group"
+                aria-label={`Bristol Type ${item.type}: ${item.count} entries, ${item.percentage}%`}
               >
                 <span className="data-kicker">Type {item.type}</span>
 
@@ -109,14 +111,9 @@ export default function BristolDistributionChart({ data }: BristolDistributionCh
                   {item.percentage > 0 && <span className="data-ping absolute inset-0 rounded-full border border-white/25" />}
                 </div>
 
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--color-text-primary)]">
-                    {getRangeLabel(item.type)}
-                  </p>
-                  <p className="mt-1 text-[11px] leading-4 text-[var(--color-text-tertiary)]">
-                    {item.count} record{item.count === 1 ? '' : 's'}
-                  </p>
-                </div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--color-text-primary)]">
+                  {getRangeLabel(item.type)}
+                </p>
 
                 <div className="chart-tooltip absolute left-1/2 top-1/2 z-10 w-44 -translate-x-1/2 -translate-y-1/2 rounded-2xl px-3 py-2 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
                   <p className="font-semibold">Type {item.type}</p>
@@ -144,6 +141,7 @@ export default function BristolDistributionChart({ data }: BristolDistributionCh
         </div>
 
         <TrendAnnotationRail
+          layout="stacked-horizontal"
           annotations={[
             {
               label: 'Dominant Form',

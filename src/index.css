@@ -680,6 +680,14 @@
     border: 1px solid rgba(197, 168, 255, 0.24);
   }
 
+  .signal-badge svg,
+  .chart-legend-chip svg {
+    display: block;
+    width: 0.875rem;
+    height: 0.875rem;
+    flex: 0 0 auto;
+  }
+
   .signal-badge-daily {
     background: rgba(139, 92, 246, 0.14);
     border-color: var(--gw-signal-border-daily);

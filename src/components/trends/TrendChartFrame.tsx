@@ -91,8 +91,10 @@ export function TrendChartFrame({
             )}
 
             {insight && (
-              <div className="flex items-start gap-2 rounded-full border border-[rgba(216,199,255,0.14)] bg-[rgba(139,92,246,0.09)] px-3 py-2 text-xs leading-5 text-[var(--color-text-secondary)] lg:max-w-[420px]">
-                <Activity className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[var(--gw-intelligence-200)]" />
+              <div className="flex items-start gap-2 rounded-[20px] border border-[rgba(216,199,255,0.14)] bg-[rgba(139,92,246,0.09)] px-3 py-2 text-xs leading-5 text-[var(--color-text-secondary)] lg:max-w-[420px] lg:rounded-full">
+                <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-[rgba(139,92,246,0.16)]">
+                  <Activity className="h-3.5 w-3.5 text-[var(--gw-intelligence-200)]" />
+                </span>
                 <span>{insight}</span>
               </div>
             )}
@@ -146,19 +148,41 @@ export function ChartEmptyState({ message }: { message: string }) {
   );
 }
 
-export function TrendAnnotationRail({ annotations }: { annotations: TrendAnnotation[] }) {
+export function TrendAnnotationRail({
+  annotations,
+  layout = 'grid',
+}: {
+  annotations: TrendAnnotation[];
+  layout?: 'grid' | 'stacked-horizontal';
+}) {
   if (annotations.length === 0) return null;
 
   return (
-    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+    <div
+      className={
+        layout === 'stacked-horizontal'
+          ? 'grid gap-3'
+          : 'grid gap-3 sm:grid-cols-2 xl:grid-cols-3'
+      }
+    >
       {annotations.map((annotation) => (
-        <TrendAnnotationCard key={`${annotation.label}-${annotation.value}`} annotation={annotation} />
+        <TrendAnnotationCard
+          key={`${annotation.label}-${annotation.value}`}
+          annotation={annotation}
+          layout={layout}
+        />
       ))}
     </div>
   );
 }
 
-function TrendAnnotationCard({ annotation }: { annotation: TrendAnnotation }) {
+function TrendAnnotationCard({
+  annotation,
+  layout,
+}: {
+  annotation: TrendAnnotation;
+  layout: 'grid' | 'stacked-horizontal';
+}) {
   const tone = annotation.tone ?? 'daily';
   const toneClassName = {
     major: 'border-[rgba(192,132,252,0.26)] bg-[rgba(124,58,237,0.12)]',
@@ -168,6 +192,24 @@ function TrendAnnotationCard({ annotation }: { annotation: TrendAnnotation }) {
     success: 'border-[rgba(52,211,153,0.2)] bg-[rgba(52,211,153,0.08)]',
     warning: 'border-[rgba(246,168,28,0.22)] bg-[rgba(246,168,28,0.08)]',
   }[tone];
+
+  if (layout === 'stacked-horizontal') {
+    return (
+      <div
+        className={`flex flex-col gap-3 rounded-[22px] border px-4 py-4 sm:flex-row sm:items-center sm:justify-between ${toneClassName}`}
+      >
+        <div className="min-w-[120px]">
+          <p className="data-kicker">{annotation.label}</p>
+          <p className="mt-1 text-lg font-semibold tracking-[-0.03em] text-[var(--color-text-primary)]">
+            {annotation.value}
+          </p>
+        </div>
+        <p className="text-xs leading-5 text-[var(--color-text-tertiary)] sm:max-w-[360px] sm:text-right">
+          {annotation.helper}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className={`rounded-[22px] border px-4 py-4 ${toneClassName}`}>
