@@ -14,7 +14,7 @@ export default function Button({
   ...props
 }: ButtonProps) {
   const baseStyles =
-    'motion-control inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[var(--gw-radius-pill)] font-semibold tracking-[-0.01em] transition-smooth disabled:cursor-not-allowed disabled:opacity-45';
+    'motion-control inline-flex items-center justify-center gap-2 whitespace-nowrap font-semibold tracking-normal transition-smooth disabled:cursor-not-allowed disabled:opacity-45';
 
   const variantStyles = {
     primary:
@@ -28,9 +28,9 @@ export default function Button({
   };
 
   const sizeStyles = {
-    sm: 'min-h-[40px] px-4 text-[var(--gw-font-size-sm)]',
-    md: 'min-h-[52px] px-6 text-[var(--gw-font-size-lg)]',
-    lg: 'min-h-[58px] px-7 text-[var(--gw-font-size-xl)]',
+    sm: 'min-h-[40px] px-3.5 text-[var(--gw-font-size-sm)]',
+    md: 'min-h-[44px] px-5 text-[var(--gw-font-size-md)]',
+    lg: 'min-h-[48px] px-6 text-[var(--gw-font-size-lg)]',
   };
 
   return (

@@ -432,24 +432,24 @@ export default function DailyCheckIn() {
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-3">
           <div
-            className={`mt-0.5 flex h-10 w-10 items-center justify-center rounded-xl ${
+            className={`mt-0.5 flex h-10 w-10 items-center justify-center rounded-[var(--gw-radius-lg)] ${
               enabled
-                ? 'bg-brand-500/12 text-brand-500 dark:text-brand-300'
-                : 'bg-neutral-bg text-neutral-muted dark:bg-dark-bg dark:text-dark-muted'
+                ? 'bg-[rgba(91,184,240,0.1)] text-[var(--gw-brand-300)]'
+                : 'bg-white/[0.035] text-[var(--color-text-tertiary)]'
             }`}
           >
             <Icon className="h-5 w-5" />
           </div>
           <div>
-            <h2 className="text-body-md font-semibold text-neutral-text dark:text-dark-text">
+            <h2 className="text-body-md font-semibold text-[var(--color-text-primary)]">
               {section.label}
             </h2>
-            <p className="mt-1 text-body-sm text-neutral-muted dark:text-dark-muted">
+            <p className="mt-1 text-body-sm leading-6 text-[var(--color-text-secondary)]">
               {section.description}
             </p>
           </div>
         </div>
-        <label className="flex items-center gap-2 text-xs font-medium text-neutral-muted dark:text-dark-muted">
+        <label className="clinical-chip min-h-8 cursor-pointer text-[var(--color-text-secondary)]">
           Include
           <input
             type="checkbox"
@@ -460,7 +460,7 @@ export default function DailyCheckIn() {
                 { ...draft[key], enabled: e.target.checked } as DailyCheckInDraft[SectionKey]
               )
             }
-            className="h-4 w-4 rounded border-neutral-border text-brand-500 focus:ring-brand-500"
+            className="h-4 w-4 rounded border-[rgba(202,190,255,0.24)] bg-transparent accent-[var(--gw-brand-400)]"
           />
         </label>
       </div>
@@ -469,18 +469,18 @@ export default function DailyCheckIn() {
 
   return (
     <MainLayout>
-      <div className="mx-auto max-w-6xl p-4 sm:p-6 lg:p-8">
-        <div className="grid gap-6 lg:grid-cols-[1.1fr_0.65fr]">
-          <div className="space-y-6">
+      <div className="mx-auto max-w-6xl px-4 py-5 sm:px-6 lg:px-8">
+        <div className="grid gap-5 lg:grid-cols-[1.1fr_0.65fr]">
+          <div className="space-y-5">
             <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-brand-500/20 bg-brand-500/6 px-3 py-1 text-xs font-medium uppercase tracking-widest text-brand-500 dark:text-brand-300">
+              <div className="clinical-chip clinical-chip-accent w-fit">
                 <ClipboardCheck className="h-3.5 w-3.5" />
                 Daily Check-In
               </div>
-              <h1 className="mt-3 text-h4 font-sora font-semibold text-neutral-text dark:text-dark-text">
+              <h1 className="page-title mt-3">
                 Log the whole day in one pass
               </h1>
-              <p className="mt-2 max-w-2xl text-body-sm text-neutral-muted dark:text-dark-muted">
+              <p className="page-subtitle mt-3 max-w-2xl">
                 This is the fastest way to give GutWise enough overlap across stool, food,
                 symptoms, hydration, sleep, stress, exercise, medication, and cycle data to find
                 clearer patterns.
@@ -490,49 +490,49 @@ export default function DailyCheckIn() {
             <TrustExplainer variant="insights" />
 
             {message && (
-              <div className="rounded-xl border border-brand-500/20 bg-brand-500/8 p-4 text-body-sm text-brand-700 dark:text-brand-300">
+              <div className="rounded-[var(--gw-radius-card)] border border-[rgba(91,184,240,0.18)] bg-[rgba(91,184,240,0.075)] p-4 text-body-sm text-[var(--gw-brand-200)]">
                 {message}
               </div>
             )}
 
             {error && (
-              <div className="rounded-xl border border-signal-500/30 bg-signal-500/10 p-4 text-body-sm text-signal-700 dark:text-signal-300">
+              <div className="rounded-[var(--gw-radius-card)] border border-[rgba(255,161,182,0.28)] bg-[rgba(255,161,182,0.09)] p-4 text-body-sm text-[var(--color-danger)]">
                 {error}
               </div>
             )}
 
             <Card variant="elevated" className="overflow-hidden">
               <div className="grid gap-4 md:grid-cols-3">
-                <div className="rounded-2xl bg-brand-500/8 p-4">
-                  <p className="text-xs font-semibold uppercase tracking-widest text-brand-500 dark:text-brand-300">
+                <div className="clinical-card p-4">
+                  <p className="data-kicker text-[var(--gw-brand-300)]">
                     Included Today
                   </p>
-                  <p className="mt-2 text-2xl font-semibold text-neutral-text dark:text-dark-text">
+                  <p className="mt-2 text-2xl font-semibold text-[var(--color-text-primary)]">
                     {enabledSections.length}
                   </p>
-                  <p className="mt-1 text-xs text-neutral-muted dark:text-dark-muted">
+                  <p className="mt-1 text-xs text-[var(--color-text-tertiary)]">
                     sections enabled
                   </p>
                 </div>
-                <div className="rounded-2xl bg-neutral-bg p-4 dark:bg-dark-bg">
-                  <p className="text-xs font-semibold uppercase tracking-widest text-neutral-muted dark:text-dark-muted">
+                <div className="clinical-card p-4">
+                  <p className="data-kicker">
                     Ready To Save
                   </p>
-                  <p className="mt-2 text-2xl font-semibold text-neutral-text dark:text-dark-text">
+                  <p className="mt-2 text-2xl font-semibold text-[var(--color-text-primary)]">
                     {completedCount}
                   </p>
-                  <p className="mt-1 text-xs text-neutral-muted dark:text-dark-muted">
+                  <p className="mt-1 text-xs text-[var(--color-text-tertiary)]">
                     sections with enough detail
                   </p>
                 </div>
-                <div className="rounded-2xl bg-discovery-500/8 p-4">
-                  <p className="text-xs font-semibold uppercase tracking-widest text-discovery-500 dark:text-discovery-300">
+                <div className="clinical-card p-4">
+                  <p className="data-kicker text-[var(--gw-intelligence-300)]">
                     Best Signal
                   </p>
-                  <p className="mt-2 text-body-md font-semibold text-neutral-text dark:text-dark-text">
+                  <p className="mt-2 text-body-md font-semibold text-[var(--color-text-primary)]">
                     Overlap matters most
                   </p>
-                  <p className="mt-1 text-xs text-neutral-muted dark:text-dark-muted">
+                  <p className="mt-1 text-xs leading-5 text-[var(--color-text-tertiary)]">
                     Stool, symptoms, meals, hydration, sleep, and stress together create the
                     strongest starting point.
                   </p>
@@ -545,7 +545,7 @@ export default function DailyCheckIn() {
                 <div className="flex-1">
                   <label
                     htmlFor="daily-logged-at"
-                    className="mb-2 block text-body-sm font-medium text-neutral-muted dark:text-dark-muted"
+                    className="field-label mb-2 block"
                   >
                     Check-in time
                   </label>
@@ -554,16 +554,16 @@ export default function DailyCheckIn() {
                     type="datetime-local"
                     value={draft.logged_at}
                     onChange={(e) => updateDraft('logged_at', e.target.value)}
-                    className="w-full rounded-xl border border-neutral-border bg-neutral-surface px-4 py-2.5 text-body-sm text-neutral-text focus:border-transparent focus:outline-none focus:ring-2 focus:ring-brand-500 dark:border-dark-border dark:bg-dark-surface dark:text-dark-text"
+                    className="input-base w-full"
                   />
                 </div>
-                <div className="flex gap-3">
+                <div className="flex flex-col gap-3 sm:flex-row">
                   <Button variant="outline" onClick={resetDraft}>
                     Reset Draft
                   </Button>
                   <Button onClick={handleSaveAll} disabled={savingAll}>
                     <Save className="mr-2 inline h-4 w-4" />
-                    {savingAll ? 'Saving...' : 'Save All Enabled Sections'}
+                    {savingAll ? 'Saving...' : 'Save all sections'}
                   </Button>
                 </div>
               </div>
@@ -572,21 +572,21 @@ export default function DailyCheckIn() {
             <Card variant="elevated">
               <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div>
-                  <div className="inline-flex items-center gap-2 rounded-full border border-neutral-border bg-neutral-bg px-3 py-1 text-xs font-semibold uppercase tracking-widest text-neutral-muted dark:border-dark-border dark:bg-dark-bg dark:text-dark-muted">
+                  <div className="clinical-chip w-fit text-[var(--color-text-secondary)]">
                     <Ban className="h-3.5 w-3.5" />
                     Mark None
                   </div>
-                  <h2 className="mt-3 text-body-md font-semibold text-neutral-text dark:text-dark-text">
+                  <h2 className="mt-3 text-body-md font-semibold text-[var(--color-text-primary)]">
                     Confirm what did not happen today
                   </h2>
-                  <p className="mt-2 max-w-2xl text-body-sm text-neutral-muted dark:text-dark-muted">
+                  <p className="mt-2 max-w-2xl text-body-sm leading-6 text-[var(--color-text-secondary)]">
                     These are saved separately from normal logs and count as daily context for
                     insights.
                   </p>
                 </div>
-                <div className="text-left text-xs text-neutral-muted dark:text-dark-muted lg:text-right">
-                  <div className="font-semibold uppercase tracking-widest">For {absenceDate}</div>
-                  <div>{todaysAbsences.length} saved today</div>
+                <div className="clinical-card p-3 text-left text-xs text-[var(--color-text-tertiary)] lg:text-right">
+                  <div className="data-kicker">For {absenceDate}</div>
+                  <div className="mt-1">{todaysAbsences.length} saved today</div>
                 </div>
               </div>
 
@@ -602,19 +602,19 @@ export default function DailyCheckIn() {
                       key={item.type}
                       type="button"
                       onClick={() => toggleAbsence(item.type)}
-                      className={`rounded-xl border px-4 py-3 text-left transition-colors ${
+                      className={`rounded-[var(--gw-radius-card)] border px-4 py-3 text-left transition-colors ${
                         selected || saved
-                          ? 'border-brand-500/40 bg-brand-500/10 text-neutral-text dark:text-dark-text'
-                          : 'border-neutral-border bg-neutral-surface text-neutral-muted hover:border-brand-300 hover:text-neutral-text dark:border-dark-border dark:bg-dark-surface dark:text-dark-muted dark:hover:border-brand-700 dark:hover:text-dark-text'
+                          ? 'border-[rgba(91,184,240,0.26)] bg-[rgba(91,184,240,0.075)] text-[var(--color-text-primary)]'
+                          : 'border-[var(--border-subtle)] bg-white/[0.025] text-[var(--color-text-secondary)] hover:border-[rgba(91,184,240,0.2)] hover:text-[var(--color-text-primary)]'
                       }`}
                     >
                       <div className="flex items-center justify-between gap-2">
                         <span className="text-body-sm font-semibold">{item.label}</span>
                         {(selected || saved) && (
-                          <CheckCircle2 className="h-4 w-4 text-brand-500 dark:text-brand-300" />
+                          <CheckCircle2 className="h-4 w-4 text-[var(--gw-brand-300)]" />
                         )}
                       </div>
-                      <p className="mt-1 text-xs text-neutral-muted dark:text-dark-muted">
+                      <p className="mt-1 text-xs leading-5 text-[var(--color-text-tertiary)]">
                         {item.description}
                       </p>
                     </button>
@@ -629,7 +629,7 @@ export default function DailyCheckIn() {
                   disabled={savingAbsences || selectedAbsences.length === 0}
                 >
                   <Save className="mr-2 inline h-4 w-4" />
-                  {savingAbsences ? 'Saving...' : 'Save None Confirmations'}
+                  {savingAbsences ? 'Saving...' : 'Save none confirmations'}
                 </Button>
               </div>
             </Card>
@@ -1264,17 +1264,17 @@ export default function DailyCheckIn() {
             </div>
           </div>
 
-          <div className="space-y-6">
-            <Card variant="discovery">
+          <div className="space-y-5">
+            <Card variant="elevated">
               <div className="flex items-start gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-discovery-500/12 text-discovery-500 dark:text-discovery-300">
+                <div className="flex h-10 w-10 items-center justify-center rounded-[var(--gw-radius-lg)] bg-[rgba(139,92,246,0.1)] text-[var(--gw-intelligence-300)]">
                   <Sparkles className="h-5 w-5" />
                 </div>
                 <div>
-                  <h2 className="text-body-md font-semibold text-neutral-text dark:text-dark-text">
+                  <h2 className="text-body-md font-semibold text-[var(--color-text-primary)]">
                     What to log first
                   </h2>
-                  <p className="mt-2 text-body-sm text-neutral-muted dark:text-dark-muted">
+                  <p className="mt-2 text-body-sm leading-6 text-[var(--color-text-secondary)]">
                     If you want the strongest first insights, start with stool, symptoms, meals,
                     hydration, sleep, and stress.
                   </p>
@@ -1283,7 +1283,7 @@ export default function DailyCheckIn() {
             </Card>
 
             <Card>
-              <h2 className="text-body-md font-semibold text-neutral-text dark:text-dark-text">
+              <h2 className="text-body-md font-semibold text-[var(--color-text-primary)]">
                 Today&apos;s progress
               </h2>
               <div className="mt-4 space-y-3">
@@ -1292,15 +1292,15 @@ export default function DailyCheckIn() {
                   return (
                     <div key={section.key} className="flex items-center gap-3 text-body-sm">
                       {enabled ? (
-                        <CheckCircle2 className="h-4 w-4 text-brand-500 dark:text-brand-300" />
+                        <CheckCircle2 className="h-4 w-4 text-[var(--gw-brand-300)]" />
                       ) : (
-                        <Circle className="h-4 w-4 text-neutral-muted dark:text-dark-muted" />
+                        <Circle className="h-4 w-4 text-[var(--color-text-tertiary)]" />
                       )}
                       <span
                         className={
                           enabled
-                            ? 'text-neutral-text dark:text-dark-text'
-                            : 'text-neutral-muted dark:text-dark-muted'
+                            ? 'text-[var(--color-text-primary)]'
+                            : 'text-[var(--color-text-tertiary)]'
                         }
                       >
                         {section.label}
@@ -1309,13 +1309,13 @@ export default function DailyCheckIn() {
                   );
                 })}
                 {todaysAbsences.length > 0 && (
-                  <div className="flex items-start gap-3 rounded-xl border border-neutral-border bg-neutral-bg p-3 text-body-sm dark:border-dark-border dark:bg-dark-bg">
-                    <Ban className="mt-0.5 h-4 w-4 text-brand-500 dark:text-brand-300" />
+                  <div className="clinical-card flex items-start gap-3 p-3 text-body-sm">
+                    <Ban className="mt-0.5 h-4 w-4 text-[var(--gw-brand-300)]" />
                     <div>
-                      <span className="font-medium text-neutral-text dark:text-dark-text">
+                      <span className="font-medium text-[var(--color-text-primary)]">
                         None confirmed
                       </span>
-                      <p className="mt-1 text-xs text-neutral-muted dark:text-dark-muted">
+                      <p className="mt-1 text-xs leading-5 text-[var(--color-text-tertiary)]">
                         {todaysAbsences
                           .map((item) => formatAbsenceLabel(item.absence_type))
                           .join(', ')}
@@ -1327,24 +1327,24 @@ export default function DailyCheckIn() {
             </Card>
 
             <Card>
-              <h2 className="text-body-md font-semibold text-neutral-text dark:text-dark-text">
+              <h2 className="text-body-md font-semibold text-[var(--color-text-primary)]">
                 None history
               </h2>
               <div className="mt-4 space-y-3">
                 {absenceHistory.length === 0 ? (
-                  <p className="text-body-sm text-neutral-muted dark:text-dark-muted">
+                  <p className="text-body-sm text-[var(--color-text-secondary)]">
                     No none confirmations saved yet.
                   </p>
                 ) : (
                   absenceHistory.slice(0, 6).map((item) => (
                     <div
                       key={item.id}
-                      className="rounded-xl border border-neutral-border bg-neutral-bg p-3 dark:border-dark-border dark:bg-dark-bg"
+                      className="clinical-card p-3"
                     >
-                      <div className="text-xs font-semibold uppercase tracking-widest text-neutral-muted dark:text-dark-muted">
+                      <div className="data-kicker">
                         {item.absence_date}
                       </div>
-                      <div className="mt-1 text-body-sm font-medium text-neutral-text dark:text-dark-text">
+                      <div className="mt-1 text-body-sm font-medium text-[var(--color-text-primary)]">
                         {formatAbsenceLabel(item.absence_type)}
                       </div>
                     </div>
@@ -1375,14 +1375,14 @@ function MetricPanel({
   helper: string;
 }) {
   return (
-    <div className="rounded-xl border border-neutral-border bg-neutral-bg px-4 py-3 dark:border-dark-border dark:bg-dark-bg">
-      <div className="text-[11px] font-semibold uppercase tracking-widest text-neutral-muted dark:text-dark-muted">
+    <div className="clinical-card px-4 py-3">
+      <div className="data-kicker">
         {label}
       </div>
-      <div className="mt-2 text-body-md font-semibold text-neutral-text dark:text-dark-text">
+      <div className="mt-2 text-body-md font-semibold text-[var(--color-text-primary)]">
         {value}
       </div>
-      <div className="mt-1 text-xs text-neutral-muted dark:text-dark-muted">{helper}</div>
+      <div className="mt-1 text-xs leading-5 text-[var(--color-text-tertiary)]">{helper}</div>
     </div>
   );
 }
@@ -1400,14 +1400,14 @@ function Field({
 }) {
   return (
     <div>
-      <label className="mb-2 block text-body-sm font-medium text-neutral-muted dark:text-dark-muted">
+      <label className="field-label mb-2 block">
         {label}
       </label>
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full rounded-xl border border-neutral-border bg-neutral-surface px-4 py-2.5 text-body-sm text-neutral-text focus:border-transparent focus:outline-none focus:ring-2 focus:ring-brand-500 dark:border-dark-border dark:bg-dark-surface dark:text-dark-text"
+        className="input-base w-full"
       />
     </div>
   );
@@ -1426,7 +1426,7 @@ function NumberField({
 }) {
   return (
     <div>
-      <label className="mb-2 block text-body-sm font-medium text-neutral-muted dark:text-dark-muted">
+      <label className="field-label mb-2 block">
         {label}
       </label>
       <input
@@ -1434,7 +1434,7 @@ function NumberField({
         value={value}
         min={min}
         onChange={(e) => onChange(parseInt(e.target.value, 10) || 0)}
-        className="w-full rounded-xl border border-neutral-border bg-neutral-surface px-4 py-2.5 text-body-sm text-neutral-text focus:border-transparent focus:outline-none focus:ring-2 focus:ring-brand-500 dark:border-dark-border dark:bg-dark-surface dark:text-dark-text"
+        className="input-base w-full"
       />
     </div>
   );
@@ -1451,14 +1451,14 @@ function DateTimeField({
 }) {
   return (
     <div>
-      <label className="mb-2 block text-body-sm font-medium text-neutral-muted dark:text-dark-muted">
+      <label className="field-label mb-2 block">
         {label}
       </label>
       <input
         type="datetime-local"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-xl border border-neutral-border bg-neutral-surface px-4 py-2.5 text-body-sm text-neutral-text focus:border-transparent focus:outline-none focus:ring-2 focus:ring-brand-500 dark:border-dark-border dark:bg-dark-surface dark:text-dark-text"
+        className="input-base w-full"
       />
     </div>
   );
@@ -1477,10 +1477,10 @@ function ToggleChip({
     <button
       type="button"
       onClick={onToggle}
-      className={`inline-flex items-center justify-center rounded-xl border px-4 py-3 text-body-sm font-medium transition-colors ${
+      className={`inline-flex min-h-11 items-center justify-center rounded-[var(--gw-radius-lg)] border px-4 py-3 text-body-sm font-medium transition-colors ${
         active
-          ? 'border-brand-500 bg-brand-500/10 text-brand-600 dark:text-brand-300'
-          : 'border-neutral-border text-neutral-muted hover:border-brand-300 hover:text-neutral-text dark:border-dark-border dark:text-dark-muted dark:hover:border-brand-700 dark:hover:text-dark-text'
+          ? 'border-[rgba(91,184,240,0.26)] bg-[rgba(91,184,240,0.075)] text-[var(--gw-brand-200)]'
+          : 'border-[var(--border-subtle)] text-[var(--color-text-secondary)] hover:border-[rgba(91,184,240,0.2)] hover:text-[var(--color-text-primary)]'
       }`}
     >
       {label}
@@ -1499,7 +1499,7 @@ function SectionActions({
     <div className="mt-5 flex justify-end">
       <Button variant="outline" onClick={onSave} disabled={saving}>
         <Save className="mr-2 inline h-4 w-4" />
-        {saving ? 'Saving...' : 'Save This Section'}
+        {saving ? 'Saving...' : 'Save section'}
       </Button>
     </div>
   );

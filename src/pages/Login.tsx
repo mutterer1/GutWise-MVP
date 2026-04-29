@@ -34,9 +34,9 @@ export default function Login() {
   return (
     <AuthShell
       mode="login"
-      badge="Secure Signal Access"
+      badge="Secure account access"
       title="Welcome back"
-      subtitle="Return to your private GutWise workspace and continue building careful, clinician-friendly pattern intelligence."
+      subtitle="Return to your private GutWise workspace and continue building careful, clinician-ready health context."
       footer={
         <div className="space-y-4 text-center">
           <p className="text-sm text-[var(--color-text-tertiary)]">
@@ -45,7 +45,7 @@ export default function Login() {
               to="/signup"
               className="motion-nav-link inline-flex font-semibold text-[var(--gw-intelligence-200)] transition-colors hover:text-[var(--gw-intelligence-100)]"
             >
-              Start free
+              Create an account
             </Link>
           </p>
           <div className="flex items-center justify-center gap-2 text-xs leading-5 text-[var(--color-text-tertiary)]">
@@ -86,7 +86,7 @@ export default function Login() {
       >
         <div>
           <label htmlFor="email" className="field-label">
-            Email Address
+            Email address
           </label>
           <div className="motion-field relative">
             <Mail className="motion-field-icon pointer-events-none absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--color-text-tertiary)]" aria-hidden="true" />
@@ -109,7 +109,7 @@ export default function Login() {
               Password
             </label>
             <span className="text-xs font-semibold text-[var(--color-text-tertiary)]">
-              Protected session
+              Protected access
             </span>
           </div>
           <div className="motion-field relative">
@@ -136,7 +136,7 @@ export default function Login() {
           </div>
         </div>
 
-        <label className="motion-checkbox flex cursor-pointer select-none items-center gap-3 rounded-2xl border border-[rgba(202,190,255,0.12)] bg-white/[0.025] px-4 py-3">
+        <label className="motion-checkbox flex cursor-pointer select-none items-center gap-3 rounded-[var(--gw-radius-lg)] border border-[rgba(202,190,255,0.12)] bg-white/[0.025] px-4 py-3">
           <input
             id="remember-me"
             name="remember-me"

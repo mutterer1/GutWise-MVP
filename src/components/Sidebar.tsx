@@ -61,6 +61,19 @@ const loggingGroups: { key: LoggingMenuItem['group']; label: string }[] = [
   { key: 'context', label: 'Context' },
 ];
 
+const navItemBase =
+  'motion-nav-link flex min-h-10 items-center gap-3 rounded-[var(--gw-radius-md)] border border-transparent px-3 py-2.5 text-sm font-semibold transition-colors duration-150';
+const navItemActive =
+  'border-[rgba(197,168,255,0.18)] bg-[rgba(139,92,246,0.1)] text-[var(--gw-intelligence-100)]';
+const navItemIdle =
+  'text-neutral-text hover:border-[rgba(202,190,255,0.12)] hover:bg-neutral-bg dark:text-dark-text dark:hover:bg-dark-surface';
+const subNavItemBase =
+  'motion-nav-link flex min-h-9 items-center gap-2.5 rounded-[var(--gw-radius-md)] border border-transparent px-3 py-2 text-sm font-medium transition-colors duration-150';
+const subNavItemIdle =
+  'text-neutral-muted hover:border-[rgba(202,190,255,0.12)] hover:bg-neutral-bg hover:text-neutral-text dark:text-dark-muted dark:hover:bg-dark-surface dark:hover:text-dark-text';
+const disabledSubNavItem =
+  'cursor-not-allowed border-[rgba(202,190,255,0.08)] bg-white/[0.02] text-neutral-muted/60 dark:text-dark-muted/55';
+
 function isCycleTrackingRelevant(gender: string | null | undefined): boolean {
   if (DEV_CYCLE_LOG_ACCESS) return true;
   return gender !== 'male';
@@ -107,10 +120,10 @@ export default function Sidebar() {
 
   return (
     <>
-      <div className="motion-reveal-soft fixed top-0 left-0 right-0 z-50 flex h-16 items-center gap-1 border-b border-neutral-border bg-neutral-surface px-3 lg:hidden dark:border-dark-border dark:bg-dark-bg">
+      <div className="motion-reveal-soft fixed top-0 left-0 right-0 z-50 flex h-14 items-center gap-2 border-b border-neutral-border bg-neutral-surface/95 px-3 backdrop-blur-md lg:hidden dark:border-dark-border dark:bg-dark-bg/95">
         <button
           type="button"
-          className="motion-icon-button flex-shrink-0 rounded-lg p-2 transition-colors hover:bg-neutral-bg dark:hover:bg-dark-surface"
+          className="motion-icon-button flex-shrink-0 rounded-[var(--gw-radius-md)] border border-transparent p-2 transition-colors hover:border-[rgba(202,190,255,0.12)] hover:bg-neutral-bg dark:hover:bg-dark-surface"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
           aria-expanded={isMobileMenuOpen}
@@ -122,11 +135,11 @@ export default function Sidebar() {
             <Menu className="h-5 w-5 text-neutral-text dark:text-dark-text" />
           )}
         </button>
-        <Link to="/dashboard" className="motion-nav-link flex items-center rounded-2xl" onClick={() => setIsMobileMenuOpen(false)}>
+        <Link to="/dashboard" className="motion-nav-link flex items-center rounded-[var(--gw-radius-md)]" onClick={() => setIsMobileMenuOpen(false)}>
           <img
             src="/logos/gutwise-horizontal-dark.svg"
             alt="GutWise"
-            style={{ height: '48px', width: 'auto', imageRendering: 'auto' }}
+            style={{ height: '42px', width: 'auto', imageRendering: 'auto' }}
           />
         </Link>
       </div>
@@ -135,23 +148,23 @@ export default function Sidebar() {
         id="app-sidebar"
         className={`
           fixed top-0 left-0 z-50 h-screen w-64 border-r border-neutral-border bg-neutral-surface
-          transition-transform duration-300 ease-[var(--gw-motion-ease-emphasized)] dark:border-dark-border dark:bg-dark-bg
+          transition-transform duration-200 ease-[var(--gw-motion-ease-emphasized)] dark:border-dark-border dark:bg-dark-bg
           ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
           lg:translate-x-0
         `}
       >
         <div className="flex h-full flex-col">
-          <div className="relative flex items-center justify-start border-b border-neutral-border px-4 py-6 dark:border-dark-border">
+          <div className="relative flex items-center justify-start border-b border-neutral-border px-4 py-4 dark:border-dark-border">
             <Link to="/dashboard" className="flex items-center" onClick={() => setIsMobileMenuOpen(false)}>
               <img
                 src="/logos/gutwise-horizontal-dark.svg"
                 alt="GutWise"
-                style={{ height: '65px', width: 'auto' }}
+                style={{ height: '56px', width: 'auto' }}
               />
             </Link>
             <button
               onClick={toggleTheme}
-              className="motion-icon-button absolute right-4 rounded-lg p-2 transition-colors hover:bg-neutral-bg dark:hover:bg-dark-surface"
+              className="motion-icon-button absolute right-4 rounded-[var(--gw-radius-md)] border border-transparent p-2 transition-colors hover:border-[rgba(202,190,255,0.12)] hover:bg-neutral-bg dark:hover:bg-dark-surface"
               aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
             >
               {theme === 'dark' ? (
@@ -162,7 +175,7 @@ export default function Sidebar() {
             </button>
           </div>
 
-          <nav className="flex-1 space-y-1 overflow-y-auto px-4 py-6">
+          <nav className="flex-1 space-y-1.5 overflow-y-auto px-3 py-4">
             {mainNavigation.map((item) => {
               const Icon = item.icon;
               const isLoggingHub = item.name === 'Logging Hub';
@@ -176,15 +189,7 @@ export default function Sidebar() {
                       onClick={() => setExpandedLoggingHub(!expandedLoggingHub)}
                       aria-expanded={expandedLoggingHub}
                       aria-controls="logging-hub-submenu"
-                      className={`
-                        w-full rounded-lg px-4 py-3 text-sm font-medium
-                        motion-nav-link flex items-center gap-3 transition-colors duration-150
-                        ${
-                          showLoggingHubActive
-                            ? 'bg-brand-100 text-brand-700 dark:bg-brand-900/30 dark:text-brand-300'
-                            : 'text-neutral-text hover:bg-neutral-bg dark:text-dark-text dark:hover:bg-dark-surface'
-                        }
-                      `}
+                      className={`w-full ${navItemBase} ${showLoggingHubActive ? navItemActive : navItemIdle}`}
                     >
                       <Icon className="h-5 w-5" />
                       <span className="flex-1 text-left">{item.name}</span>
@@ -196,7 +201,7 @@ export default function Sidebar() {
                     </button>
 
                     {expandedLoggingHub && (
-                      <div id="logging-hub-submenu" className="mt-1 ml-2 border-l border-neutral-border pl-2 dark:border-dark-border">
+                      <div id="logging-hub-submenu" className="mt-2 ml-2 border-l border-neutral-border/70 pl-2 dark:border-dark-border/70">
                         {loggingGroups.map((group, groupIdx) => {
                           const groupItems = loggingSubmenu.filter((s) => s.group === group.key);
                           return (
@@ -208,7 +213,7 @@ export default function Sidebar() {
                                   : ''
                               }
                             >
-                              <span className="block px-4 pt-1.5 pb-0.5 text-[9px] font-semibold uppercase tracking-widest text-neutral-muted/50 dark:text-dark-muted/40">
+                              <span className="block px-3 pt-1.5 pb-0.5 text-[9px] font-semibold uppercase tracking-[0.08em] text-neutral-muted/55 dark:text-dark-muted/45">
                                 {group.label}
                               </span>
                               {groupItems.map((subitem) => {
@@ -216,27 +221,37 @@ export default function Sidebar() {
                                 const subActive = isActive(subitem.href);
                                 const isCycleItem = subitem.href === '/menstrual-cycle-log';
                                 const dimmed = isCycleItem && !cycleRelevant;
+                                if (dimmed) {
+                                  return (
+                                    <div
+                                      key={subitem.name}
+                                      className={`${subNavItemBase} ${disabledSubNavItem}`}
+                                      role="link"
+                                      aria-disabled="true"
+                                      title="Unavailable for this profile"
+                                    >
+                                      <SubIcon className="h-4 w-4 flex-shrink-0" />
+                                      <span className="min-w-0">
+                                        <span className="block text-xs font-semibold leading-4">
+                                          {subitem.name}
+                                        </span>
+                                        <span className="block text-[11px] font-medium leading-4 text-neutral-muted/70 dark:text-dark-muted/60">
+                                          Unavailable for this profile
+                                        </span>
+                                      </span>
+                                    </div>
+                                  );
+                                }
+
                                 return (
                                   <Link
                                     key={subitem.name}
                                     to={subitem.href}
-                                    className={`
-                                      motion-nav-link flex items-center gap-3 rounded-lg px-4 py-2 text-sm font-medium
-                                      transition-colors duration-150
-                                      ${
-                                        dimmed
-                                          ? 'pointer-events-none cursor-default opacity-40'
-                                          : subActive
-                                            ? 'bg-brand-100 text-brand-700 dark:bg-brand-900/30 dark:text-brand-300'
-                                            : 'text-neutral-muted hover:bg-neutral-bg hover:text-neutral-text dark:text-dark-muted dark:hover:bg-dark-surface dark:hover:text-dark-text'
-                                      }
-                                    `}
-                                    onClick={dimmed ? undefined : () => setIsMobileMenuOpen(false)}
-                                    tabIndex={dimmed ? -1 : undefined}
-                                    aria-disabled={dimmed}
+                                    className={`${subNavItemBase} ${subActive ? navItemActive : subNavItemIdle}`}
+                                    onClick={() => setIsMobileMenuOpen(false)}
                                     aria-current={subActive ? 'page' : undefined}
                                   >
-                                    <SubIcon className="h-4 w-4" />
+                                    <SubIcon className="h-4 w-4 flex-shrink-0" />
                                     <span className="text-xs">{subitem.name}</span>
                                   </Link>
                                 );
@@ -254,15 +269,7 @@ export default function Sidebar() {
                 <Link
                   key={item.name}
                   to={item.href!}
-                  className={`
-                    motion-nav-link flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium
-                    transition-colors duration-150
-                    ${
-                      active
-                        ? 'bg-brand-100 text-brand-700 dark:bg-brand-900/30 dark:text-brand-300'
-                        : 'text-neutral-text hover:bg-neutral-bg dark:text-dark-text dark:hover:bg-dark-surface'
-                    }
-                  `}
+                  className={`${navItemBase} ${active ? navItemActive : navItemIdle}`}
                   onClick={() => setIsMobileMenuOpen(false)}
                   aria-current={active ? 'page' : undefined}
                 >
@@ -273,10 +280,10 @@ export default function Sidebar() {
             })}
           </nav>
 
-          <div className="border-t border-neutral-border px-6 py-4 dark:border-dark-border">
+          <div className="border-t border-neutral-border px-4 py-4 dark:border-dark-border">
             <Link
               to="/account"
-              className="motion-nav-link flex items-center gap-3 rounded-lg px-2 transition-colors duration-150 hover:bg-neutral-bg dark:hover:bg-dark-surface"
+              className="motion-nav-link flex items-center gap-3 rounded-[var(--gw-radius-md)] border border-transparent px-2 py-2 transition-colors duration-150 hover:border-[rgba(202,190,255,0.12)] hover:bg-neutral-bg dark:hover:bg-dark-surface"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-brand-700 font-semibold text-white">
@@ -296,7 +303,7 @@ export default function Sidebar() {
 
       {isMobileMenuOpen && (
         <div
-          className="animate-overlay-in fixed inset-0 z-40 bg-black/50 lg:hidden"
+          className="animate-overlay-in fixed inset-0 z-40 bg-black/45 backdrop-blur-[2px] lg:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
           aria-hidden="true"
         />

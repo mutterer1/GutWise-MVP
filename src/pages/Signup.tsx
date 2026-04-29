@@ -34,9 +34,9 @@ export default function Signup() {
   return (
     <AuthShell
       mode="signup"
-      badge="Start Gut Intelligence"
+      badge="Create private workspace"
       title="Create your workspace"
-      subtitle="Set up a private account for non-diagnostic pattern detection across logs, symptoms, lifestyle context, and clinician-ready reports."
+      subtitle="Set up a private account for non-diagnostic pattern review across logs, symptoms, lifestyle context, and clinician-ready reports."
       footer={
         <div className="space-y-4 text-center">
           <p className="text-sm text-[var(--color-text-tertiary)]">
@@ -75,7 +75,7 @@ export default function Signup() {
       >
         <div>
           <label htmlFor="name" className="field-label">
-            Full Name
+            Full name
           </label>
           <div className="motion-field relative">
             <User className="motion-field-icon pointer-events-none absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--color-text-tertiary)]" aria-hidden="true" />
@@ -94,7 +94,7 @@ export default function Signup() {
 
         <div>
           <label htmlFor="email" className="field-label">
-            Email Address
+            Email address
           </label>
           <div className="motion-field relative">
             <Mail className="motion-field-icon pointer-events-none absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--color-text-tertiary)]" aria-hidden="true" />
@@ -135,7 +135,7 @@ export default function Signup() {
           </p>
         </div>
 
-        <label className="motion-checkbox flex cursor-pointer select-none items-start gap-3 rounded-2xl border border-[rgba(202,190,255,0.12)] bg-white/[0.025] px-4 py-3">
+        <label className="motion-checkbox flex cursor-pointer select-none items-start gap-3 rounded-[var(--gw-radius-lg)] border border-[rgba(202,190,255,0.12)] bg-white/[0.025] px-4 py-3">
           <input
             id="terms"
             name="terms"

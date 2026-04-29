@@ -113,13 +113,17 @@
   --gw-dark-text-tertiary: #a7a0c2;
 
   --gw-radius-xs: 6px;
-  --gw-radius-sm: 10px;
-  --gw-radius-md: 14px;
-  --gw-radius-lg: 18px;
-  --gw-radius-xl: 24px;
-  --gw-radius-2xl: 32px;
-  --gw-radius-3xl: 42px;
+  --gw-radius-sm: 8px;
+  --gw-radius-md: 10px;
+  --gw-radius-lg: 12px;
+  --gw-radius-xl: 16px;
+  --gw-radius-2xl: 20px;
+  --gw-radius-3xl: 24px;
   --gw-radius-pill: 999px;
+  --gw-radius-control: var(--gw-radius-md);
+  --gw-radius-card: var(--gw-radius-lg);
+  --gw-radius-panel: var(--gw-radius-xl);
+  --gw-radius-page: var(--gw-radius-2xl);
 
   --gw-space-1: 4px;
   --gw-space-2: 8px;
@@ -155,11 +159,11 @@
   --gw-line-height-normal: 1.5;
   --gw-line-height-relaxed: 1.68;
 
-  --gw-letter-spacing-tight: -0.045em;
-  --gw-letter-spacing-snug: -0.025em;
+  --gw-letter-spacing-tight: -0.024em;
+  --gw-letter-spacing-snug: -0.012em;
   --gw-letter-spacing-normal: 0;
-  --gw-letter-spacing-wide: 0.035em;
-  --gw-letter-spacing-caps: 0.12em;
+  --gw-letter-spacing-wide: 0.018em;
+  --gw-letter-spacing-caps: 0.075em;
 
   --gw-shadow-xs: 0 1px 2px rgba(7, 10, 24, 0.05);
   --gw-shadow-sm: 0 8px 18px rgba(7, 10, 24, 0.08);
@@ -168,16 +172,16 @@
   --gw-shadow-xl: 0 52px 104px rgba(7, 10, 24, 0.22);
 
   --gw-shadow-dark-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --gw-shadow-dark-sm: 0 12px 28px rgba(0, 0, 0, 0.34);
-  --gw-shadow-dark-md: 0 26px 58px rgba(0, 0, 0, 0.44);
-  --gw-shadow-dark-lg: 0 42px 88px rgba(0, 0, 0, 0.52);
-  --gw-shadow-dark-xl: 0 62px 124px rgba(0, 0, 0, 0.62);
+  --gw-shadow-dark-sm: 0 10px 24px rgba(0, 0, 0, 0.28);
+  --gw-shadow-dark-md: 0 18px 44px rgba(0, 0, 0, 0.34);
+  --gw-shadow-dark-lg: 0 28px 64px rgba(0, 0, 0, 0.42);
+  --gw-shadow-dark-xl: 0 44px 92px rgba(0, 0, 0, 0.5);
 
-  --gw-glow-brand-soft: 0 0 0 1px rgba(91, 184, 240, 0.1), 0 14px 34px rgba(49, 155, 216, 0.08);
-  --gw-glow-rose-soft: 0 0 0 1px rgba(240, 111, 155, 0.11), 0 14px 34px rgba(240, 111, 155, 0.07);
-  --gw-glow-intelligence-soft: 0 0 0 1px rgba(139, 92, 246, 0.12), 0 14px 38px rgba(139, 92, 246, 0.1);
-  --gw-glow-intelligence-major: 0 0 0 1px rgba(192, 132, 252, 0.18), 0 18px 48px rgba(124, 58, 237, 0.18);
-  --gw-glow-caution-soft: 0 0 0 1px rgba(250, 194, 74, 0.1), 0 14px 34px rgba(250, 194, 74, 0.07);
+  --gw-glow-brand-soft: 0 0 0 1px rgba(91, 184, 240, 0.08), 0 10px 26px rgba(49, 155, 216, 0.045);
+  --gw-glow-rose-soft: 0 0 0 1px rgba(240, 111, 155, 0.08), 0 10px 26px rgba(240, 111, 155, 0.045);
+  --gw-glow-intelligence-soft: 0 0 0 1px rgba(139, 92, 246, 0.08), 0 10px 28px rgba(139, 92, 246, 0.055);
+  --gw-glow-intelligence-major: 0 0 0 1px rgba(192, 132, 252, 0.12), 0 14px 36px rgba(124, 58, 237, 0.1);
+  --gw-glow-caution-soft: 0 0 0 1px rgba(250, 194, 74, 0.08), 0 10px 26px rgba(250, 194, 74, 0.045);
 
   --gw-motion-ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
   --gw-motion-ease-emphasized: cubic-bezier(0.16, 1, 0.3, 1);
@@ -188,7 +192,7 @@
   --gw-motion-duration-slow: 360ms;
   --gw-motion-duration-enter: 520ms;
   --gw-motion-stagger: 58ms;
-  --gw-motion-hover-lift: -2px;
+  --gw-motion-hover-lift: -1px;
   --gw-motion-press-scale: 0.985;
 
   --gw-transition-fast: var(--gw-motion-duration-fast) var(--gw-motion-ease-standard);
@@ -204,39 +208,39 @@
   --gw-gradient-intelligence: linear-gradient(135deg, #d8c7ff 0%, #9b7cff 45%, #6d5dfc 100%);
   --gw-gradient-intelligence-major: linear-gradient(135deg, #c084fc 0%, #7c3aed 42%, #34127a 100%);
   --gw-gradient-intelligence-critical: linear-gradient(135deg, #f0abfc 0%, #9333ea 38%, #1e0b4d 100%);
-  --gw-gradient-calm: linear-gradient(180deg, rgba(91, 184, 240, 0.16) 0%, rgba(139, 92, 246, 0.04) 100%);
+  --gw-gradient-calm: linear-gradient(180deg, rgba(91, 184, 240, 0.08) 0%, rgba(139, 92, 246, 0.025) 100%);
   --gw-gradient-hero:
-    radial-gradient(circle at 12% 8%, rgba(91, 184, 240, 0.16), transparent 28%),
-    radial-gradient(circle at 84% 18%, rgba(139, 92, 246, 0.2), transparent 26%),
-    radial-gradient(circle at 58% 88%, rgba(240, 111, 155, 0.1), transparent 28%),
+    radial-gradient(circle at 12% 8%, rgba(91, 184, 240, 0.07), transparent 28%),
+    radial-gradient(circle at 84% 18%, rgba(139, 92, 246, 0.08), transparent 26%),
+    radial-gradient(circle at 58% 88%, rgba(240, 111, 155, 0.04), transparent 28%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.018), rgba(255, 255, 255, 0));
   --gw-gradient-surface:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.062) 0%, rgba(255, 255, 255, 0.018) 100%);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.046) 0%, rgba(255, 255, 255, 0.014) 100%);
   --gw-gradient-panel:
     linear-gradient(180deg, rgba(20, 25, 54, 0.98) 0%, rgba(11, 15, 34, 0.98) 100%);
   --gw-gradient-royal-panel:
-    radial-gradient(circle at 18% 0%, rgba(139, 92, 246, 0.18), transparent 34%),
+    radial-gradient(circle at 18% 0%, rgba(139, 92, 246, 0.08), transparent 34%),
     linear-gradient(180deg, rgba(24, 18, 56, 0.98) 0%, rgba(10, 14, 32, 0.98) 100%);
   --gw-gradient-signal-mesh:
-    radial-gradient(circle at 14% 16%, rgba(91, 184, 240, 0.12), transparent 24%),
-    radial-gradient(circle at 78% 8%, rgba(139, 92, 246, 0.22), transparent 25%),
-    radial-gradient(circle at 84% 84%, rgba(240, 111, 155, 0.12), transparent 28%);
+    radial-gradient(circle at 14% 16%, rgba(91, 184, 240, 0.055), transparent 24%),
+    radial-gradient(circle at 78% 8%, rgba(139, 92, 246, 0.075), transparent 25%),
+    radial-gradient(circle at 84% 84%, rgba(240, 111, 155, 0.035), transparent 28%);
 
   --gw-chart-axis: rgba(216, 213, 232, 0.42);
-  --gw-chart-grid: rgba(202, 190, 255, 0.1);
+  --gw-chart-grid: rgba(202, 190, 255, 0.07);
   --gw-chart-line-primary: #a78bfa;
   --gw-chart-line-secondary: #5bb8f0;
   --gw-chart-line-accent: #f06f9b;
-  --gw-chart-fill-primary: rgba(139, 92, 246, 0.16);
-  --gw-chart-fill-major: rgba(124, 58, 237, 0.26);
+  --gw-chart-fill-primary: rgba(139, 92, 246, 0.1);
+  --gw-chart-fill-major: rgba(124, 58, 237, 0.16);
   --gw-chart-tooltip: rgba(10, 14, 32, 0.96);
 
   --gw-signal-daily: var(--gw-gradient-intelligence);
   --gw-signal-major: var(--gw-gradient-intelligence-major);
   --gw-signal-critical: var(--gw-gradient-intelligence-critical);
-  --gw-signal-border-daily: rgba(216, 199, 255, 0.28);
-  --gw-signal-border-major: rgba(192, 132, 252, 0.36);
-  --gw-signal-border-critical: rgba(240, 171, 252, 0.42);
+  --gw-signal-border-daily: rgba(216, 199, 255, 0.16);
+  --gw-signal-border-major: rgba(192, 132, 252, 0.22);
+  --gw-signal-border-critical: rgba(240, 171, 252, 0.28);
 
   --gw-category-food: #8b5cf6;
   --gw-category-medication: #a855f7;

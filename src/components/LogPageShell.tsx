@@ -43,31 +43,28 @@ export default function LogPageShell({
         <button
           type="button"
           onClick={() => navigate('/dashboard')}
-          className="mb-6 inline-flex items-center gap-2 rounded-full border border-[rgba(197,168,255,0.16)] bg-[rgba(139,92,246,0.07)] px-3.5 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--gw-intelligence-300)] transition-smooth hover:border-[rgba(197,168,255,0.3)] hover:bg-[rgba(139,92,246,0.12)] hover:text-[var(--gw-intelligence-200)]"
+          className="clinical-chip motion-control mb-3 text-[var(--gw-intelligence-200)] hover:border-[rgba(197,168,255,0.22)] hover:bg-[rgba(139,92,246,0.08)]"
         >
           <ArrowLeft className="h-4 w-4" />
           Dashboard
         </button>
 
-        <section className="intelligence-console page-enter px-5 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
-          <div className="pointer-events-none absolute right-[-9rem] top-[-10rem] h-72 w-72 rounded-full bg-[rgba(139,92,246,0.16)] blur-3xl" />
-          <div className="pointer-events-none absolute bottom-[-12rem] left-[-10rem] h-80 w-80 rounded-full bg-[rgba(91,184,240,0.08)] blur-3xl" />
-
+        <section className="clinical-panel page-enter px-4 py-4 sm:px-5 sm:py-5 lg:px-6 lg:py-6">
           <div className="relative">
-            <div className="page-header mb-6">
-              <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+            <div className="mb-4 border-b border-[var(--border-subtle)] pb-4">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div className="max-w-3xl">
-                  <span className="signal-badge signal-badge-daily mb-4">
+                  <span className="clinical-chip clinical-chip-intelligence mb-3">
                     {icon}
                     {eyebrow}
                   </span>
-                  <h1 className="page-title">{title}</h1>
-                  <p className="page-subtitle mt-3 max-w-2xl">{subtitle}</p>
+                  <h1 className="clinical-page-title">{title}</h1>
+                  <p className="clinical-page-subtitle mt-2">{subtitle}</p>
                 </div>
 
-                <div className="hidden max-w-xs rounded-[26px] border border-[rgba(197,168,255,0.16)] bg-white/[0.035] p-4 lg:block">
+                <div className="clinical-card hidden max-w-xs p-3 lg:block">
                   <p className="data-kicker">Capture standard</p>
-                  <p className="mt-2 text-sm leading-6 text-[var(--color-text-secondary)]">
+                  <p className="mt-2 text-sm leading-5 text-[var(--color-text-secondary)]">
                     Log the primary event first. Add optional context only when it improves the
                     signal.
                   </p>
@@ -80,12 +77,12 @@ export default function LogPageShell({
             </div>
 
             {error && (
-              <div className="mb-6 rounded-2xl border border-[rgba(255,161,182,0.28)] bg-[rgba(255,161,182,0.09)] px-4 py-3 text-sm text-[var(--color-danger)]">
+              <div className="mb-5 rounded-[var(--gw-radius-card)] border border-[rgba(255,161,182,0.28)] bg-[rgba(255,161,182,0.09)] px-4 py-3 text-sm text-[var(--color-danger)]">
                 {error}
               </div>
             )}
 
-            <div className="space-y-5">{children}</div>
+            <div className="space-y-4">{children}</div>
           </div>
         </section>
       </div>

@@ -18,13 +18,18 @@ export default function LogModeTabs({
   historyLabel = 'History',
 }: LogModeTabsProps) {
   return (
-    <div className="mb-lg flex w-fit gap-1 rounded-2xl border border-[rgba(197,168,255,0.16)] bg-[rgba(7,10,24,0.36)] p-1">
+    <div
+      className="mb-5 flex w-full flex-col gap-1 rounded-[var(--gw-radius-lg)] border border-[rgba(197,168,255,0.12)] bg-[rgba(7,10,24,0.28)] p-1 sm:w-fit sm:flex-row"
+      role="group"
+      aria-label="Log view"
+    >
       <button
         type="button"
         onClick={onShowNew}
-        className={`flex items-center rounded-xl px-4 py-2 text-body-sm font-semibold transition-smooth ${
+        aria-pressed={!showHistory}
+        className={`flex min-h-10 items-center justify-center rounded-[var(--gw-radius-md)] px-4 py-2 text-body-sm font-semibold transition-smooth ${
           !showHistory
-            ? 'border border-[rgba(197,168,255,0.22)] bg-[rgba(139,92,246,0.16)] text-[var(--gw-intelligence-200)] shadow-[0_0_22px_rgba(139,92,246,0.14)]'
+            ? 'border border-[rgba(197,168,255,0.18)] bg-[rgba(139,92,246,0.1)] text-[var(--gw-intelligence-200)]'
             : 'text-[var(--color-text-tertiary)] hover:bg-white/[0.04] hover:text-[var(--color-text-secondary)]'
         }`}
       >
@@ -34,9 +39,10 @@ export default function LogModeTabs({
       <button
         type="button"
         onClick={onShowHistory}
-        className={`flex items-center rounded-xl px-4 py-2 text-body-sm font-semibold transition-smooth ${
+        aria-pressed={showHistory}
+        className={`flex min-h-10 items-center justify-center rounded-[var(--gw-radius-md)] px-4 py-2 text-body-sm font-semibold transition-smooth ${
           showHistory
-            ? 'border border-[rgba(197,168,255,0.22)] bg-[rgba(139,92,246,0.16)] text-[var(--gw-intelligence-200)] shadow-[0_0_22px_rgba(139,92,246,0.14)]'
+            ? 'border border-[rgba(197,168,255,0.18)] bg-[rgba(139,92,246,0.1)] text-[var(--gw-intelligence-200)]'
             : 'text-[var(--color-text-tertiary)] hover:bg-white/[0.04] hover:text-[var(--color-text-secondary)]'
         }`}
       >
