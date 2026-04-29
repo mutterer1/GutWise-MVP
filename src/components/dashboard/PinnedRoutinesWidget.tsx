@@ -223,6 +223,15 @@ export default function PinnedRoutinesWidget() {
   const [totalCount, setTotalCount] = useState(0);
   const [maxRoutines, setMaxRoutines] = useState(12);
 
+  useEffect(() => {
+    mountedRef.current = true;
+
+    return () => {
+      mountedRef.current = false;
+      requestIdRef.current += 1;
+    };
+  }, []);
+
   const loadRoutines = useCallback(async () => {
     const requestId = requestIdRef.current + 1;
     requestIdRef.current = requestId;
@@ -265,13 +274,7 @@ export default function PinnedRoutinesWidget() {
     loadRoutines();
   }, [loadRoutines]);
 
-  useEffect(() => {
-    return () => {
-      mountedRef.current = false;
-    };
-  }, []);
-
-  const useRoutine = async (routine: LogRoutine) => {
+  const handleUseRoutine = async (routine: LogRoutine) => {
     const staged = stageLogTemplateDraft(routine.log_type, routine.routine_payload);
 
     if (!staged) {
@@ -474,7 +477,7 @@ export default function PinnedRoutinesWidget() {
                 <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                   <button
                     type="button"
-                    onClick={() => useRoutine(routine)}
+                    onClick={() => handleUseRoutine(routine)}
                     className="inline-flex items-center justify-center gap-1.5 rounded-full border border-[rgba(143,128,246,0.24)] bg-[rgba(143,128,246,0.10)] px-3 py-2 text-xs font-semibold text-[var(--gw-brand-300)] transition-smooth hover:border-[rgba(143,128,246,0.38)] hover:bg-[rgba(143,128,246,0.14)]"
                   >
                     <Copy className="h-3.5 w-3.5" />

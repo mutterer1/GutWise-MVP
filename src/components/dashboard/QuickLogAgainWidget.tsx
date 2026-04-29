@@ -248,6 +248,15 @@ export default function QuickLogAgainWidget() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  useEffect(() => {
+    mountedRef.current = true;
+
+    return () => {
+      mountedRef.current = false;
+      requestIdRef.current += 1;
+    };
+  }, []);
+
   const fetchRecentTemplates = useCallback(async () => {
     const requestId = requestIdRef.current + 1;
     requestIdRef.current = requestId;
@@ -340,13 +349,7 @@ export default function QuickLogAgainWidget() {
     fetchRecentTemplates();
   }, [fetchRecentTemplates]);
 
-  useEffect(() => {
-    return () => {
-      mountedRef.current = false;
-    };
-  }, []);
-
-  const useTemplate = (template: RecentTemplate) => {
+  const handleUseTemplate = (template: RecentTemplate) => {
     const staged = stageLogTemplateDraft(template.logType, template.entry);
 
     if (!staged) {
@@ -460,7 +463,7 @@ export default function QuickLogAgainWidget() {
                 <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                   <button
                     type="button"
-                    onClick={() => useTemplate(template)}
+                    onClick={() => handleUseTemplate(template)}
                     className="inline-flex items-center justify-center gap-1.5 rounded-full border border-[rgba(143,128,246,0.22)] bg-[rgba(143,128,246,0.08)] px-3 py-2 text-xs font-semibold text-[var(--gw-brand-300)] transition-smooth hover:border-[rgba(143,128,246,0.36)] hover:bg-[rgba(143,128,246,0.12)]"
                   >
                     <Copy className="h-3.5 w-3.5" />
