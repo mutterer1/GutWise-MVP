@@ -9,7 +9,6 @@ import {
   MapPin,
   Pencil,
   Save,
-  Sparkles,
 } from 'lucide-react';
 import Button from '../components/Button';
 import EmptyState from '../components/EmptyState';
@@ -70,10 +69,10 @@ function hasContextDetails(formData: SymptomsFormData) {
 }
 
 function getSeverityLabel(severity: number) {
-  if (severity <= 3) return 'Mild signal';
-  if (severity <= 6) return 'Moderate signal';
-  if (severity <= 8) return 'High signal';
-  return 'Major signal';
+  if (severity <= 3) return 'Mild';
+  if (severity <= 6) return 'Moderate';
+  if (severity <= 8) return 'High';
+  return 'Major';
 }
 
 export default function SymptomsLog() {
@@ -170,9 +169,9 @@ export default function SymptomsLog() {
 
   return (
     <LogPageShell
-      title="Symptom Signal Capture"
+      title="Symptom Log"
       subtitle="Capture the symptom and intensity first. Add location, triggers, and notes only when they help explain the pattern."
-      eyebrow="Symptom Intelligence Capture"
+      eyebrow="Symptom entry"
       icon={<AlertCircle className="h-3.5 w-3.5" />}
       maxWidth="7xl"
       message={message}
@@ -193,15 +192,15 @@ export default function SymptomsLog() {
         <form onSubmit={handleSubmit} className="space-y-5">
           {editingId && <EditingBanner label="Editing symptom entry" onCancel={resetForm} />}
 
-          <div className="grid gap-5 xl:grid-cols-[1.42fr_0.78fr]">
-            <section className="log-input-shell p-5 sm:p-6">
+          <div className="log-workflow-grid">
+            <section className="log-primary-panel">
               <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div>
-                  <span className="signal-badge signal-badge-major mb-4">
-                    <Sparkles className="h-3.5 w-3.5" />
-                    Symptom Console
+                  <span className="clinical-chip clinical-chip-intelligence mb-3">
+                    <Activity className="h-3.5 w-3.5" />
+                    Symptom details
                   </span>
-                  <h2 className="text-3xl font-semibold tracking-[-0.04em] text-[var(--color-text-primary)]">
+                  <h2 className="log-section-title">
                     What changed in your body?
                   </h2>
                   <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--color-text-secondary)]">
@@ -211,15 +210,15 @@ export default function SymptomsLog() {
                   </p>
                 </div>
 
-                <div className="rounded-[22px] border border-[rgba(197,168,255,0.16)] bg-white/[0.035] px-4 py-3">
-                  <p className="data-kicker">Current signal</p>
+                <div className="log-readout">
+                  <p className="data-kicker">Current entry</p>
                   <p className="mt-1 text-lg font-semibold tracking-[-0.03em] text-[var(--color-text-primary)]">
                     {formData.symptom_type || 'No symptom selected'}
                   </p>
                 </div>
               </div>
 
-              <div className="rounded-[28px] border border-[rgba(197,168,255,0.16)] bg-[rgba(7,10,24,0.34)] p-4 sm:p-5">
+              <div className="log-section-card">
                 <div className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
                   <div>
                     <p className="data-kicker">Symptom Type</p>
@@ -228,7 +227,7 @@ export default function SymptomsLog() {
                     </p>
                   </div>
                   {formData.symptom_type && (
-                    <span className="signal-badge signal-badge-daily">
+                    <span className="clinical-chip">
                       Selected
                     </span>
                   )}
@@ -241,7 +240,7 @@ export default function SymptomsLog() {
                       type="button"
                       onClick={() => setFormData({ ...formData, symptom_type: symptom })}
                       className={[
-                        'rounded-[22px] border px-3 py-4 text-sm font-semibold transition-smooth',
+                        'log-option-button',
                         formData.symptom_type === symptom
                           ? 'border-[rgba(197,168,255,0.32)] bg-[rgba(139,92,246,0.14)] text-[var(--gw-intelligence-200)]'
                           : 'border-white/10 bg-white/[0.026] text-[var(--color-text-secondary)] hover:border-[rgba(197,168,255,0.2)] hover:bg-white/[0.045]',
@@ -276,7 +275,7 @@ export default function SymptomsLog() {
               </div>
 
               <div className="mt-5 grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
-                <div className="rounded-[28px] border border-[rgba(197,168,255,0.16)] bg-white/[0.035] p-4 sm:p-5">
+                <div className="log-section-card">
                   <label className="field-label mb-2 block">
                     Severity:{' '}
                     <span className="font-semibold text-[var(--gw-intelligence-200)]">
@@ -305,7 +304,7 @@ export default function SymptomsLog() {
                   </div>
                 </div>
 
-                <label className="rounded-[28px] border border-[rgba(197,168,255,0.14)] bg-white/[0.035] p-4 sm:p-5">
+                <label className="log-section-card">
                   <span className="field-label mb-2 block">Duration (minutes)</span>
                   <input
                     type="number"
@@ -324,11 +323,11 @@ export default function SymptomsLog() {
               </div>
             </section>
 
-            <aside className="signal-card signal-card-major h-fit p-5 sm:p-6 xl:sticky xl:top-6">
+            <aside className="log-summary-panel">
               <div className="mb-5 flex items-start justify-between gap-4">
                 <div>
-                  <p className="data-kicker">Symptom Signal</p>
-                  <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em] text-[var(--color-text-primary)]">
+                  <p className="data-kicker">Symptom summary</p>
+                  <h2 className="log-summary-title">
                     {getSeverityLabel(formData.severity)}
                   </h2>
                 </div>
@@ -360,10 +359,10 @@ export default function SymptomsLog() {
                   <SummaryMetric label="Duration" value={`${formData.duration_minutes}m`} />
                 </div>
 
-                <div className="rounded-2xl border border-[rgba(197,168,255,0.16)] bg-white/[0.035] p-4">
+                <div className="log-summary-note">
                   <p className="data-kicker">Context standard</p>
                   <p className="mt-2 text-sm leading-6 text-[var(--color-text-secondary)]">
-                    Add triggers when they are plausible, not just available. GutWise needs signal,
+                    Add triggers when they are plausible, not just available. GutWise needs useful context,
                     not noise.
                   </p>
                 </div>
@@ -375,7 +374,7 @@ export default function SymptomsLog() {
                   className="w-full"
                 >
                   <Save className="mr-2 inline h-4 w-4" />
-                  {saving ? 'Saving...' : editingId ? 'Update Entry' : 'Save Symptom Signal'}
+                  {saving ? 'Saving...' : editingId ? 'Update Entry' : 'Save entry'}
                 </Button>
 
                 {editingId && (
@@ -387,7 +386,7 @@ export default function SymptomsLog() {
             </aside>
           </div>
 
-          <section className="rounded-[28px] border border-[rgba(197,168,255,0.14)] bg-white/[0.026] px-4 py-3 sm:px-5">
+          <section className="log-disclosure-panel">
             <button
               type="button"
               onClick={() => setShowContext(!showContext)}
@@ -410,7 +409,7 @@ export default function SymptomsLog() {
             </button>
 
             {showContext && (
-              <div className="mt-5 space-y-6 border-t border-white/8 pt-5">
+              <div className="log-disclosure-content space-y-5">
                 <label htmlFor="location" className="block">
                   <span className="field-label mb-2 flex items-center gap-2">
                     <MapPin className="h-4 w-4" />
@@ -441,7 +440,7 @@ export default function SymptomsLog() {
                         type="button"
                         onClick={() => toggleTrigger(trigger)}
                         className={[
-                          'rounded-[20px] border px-3 py-3 text-sm font-semibold transition-smooth',
+                          'log-option-button',
                           formData.triggers.includes(trigger)
                             ? 'border-[rgba(197,168,255,0.26)] bg-[rgba(139,92,246,0.12)] text-[var(--gw-intelligence-300)]'
                             : 'border-white/10 bg-white/[0.026] text-[var(--color-text-tertiary)] hover:border-[rgba(197,168,255,0.2)] hover:bg-white/[0.045] hover:text-[var(--color-text-secondary)]',
@@ -471,7 +470,7 @@ export default function SymptomsLog() {
           </section>
         </form>
       ) : (
-        <section className="surface-panel rounded-[32px] p-5 sm:p-6">
+        <section className="log-history-panel">
           {history.length === 0 ? (
             <EmptyState
               category="symptoms"
@@ -496,7 +495,7 @@ export default function SymptomsLog() {
                       {group.entries.map((log) => (
                         <div
                           key={log.id}
-                          className="rounded-[24px] border border-[rgba(197,168,255,0.13)] bg-white/[0.035] p-4 transition-smooth hover:border-[rgba(197,168,255,0.22)] hover:bg-white/[0.05]"
+                          className="log-section-card transition-smooth hover:border-[rgba(197,168,255,0.22)] hover:bg-white/[0.05]"
                         >
                           <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                             <div>
@@ -587,7 +586,7 @@ function EditingBanner({ label, onCancel }: { label: string; onCancel: () => voi
 
 function SummaryMetric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
+    <div className="log-summary-note">
       <p className="metric-label">{label}</p>
       <p className="metric-value mt-2 text-[2.25rem]">{value}</p>
     </div>

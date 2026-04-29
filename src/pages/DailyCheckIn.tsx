@@ -9,7 +9,6 @@ import {
   Moon,
   Pill,
   Save,
-  Sparkles,
   Zap,
   Waves,
   AlertCircle,
@@ -20,7 +19,6 @@ import {
 import MainLayout from '../components/MainLayout';
 import Card from '../components/Card';
 import Button from '../components/Button';
-import TrustExplainer from '../components/TrustExplainer';
 import { useAuth } from '../contexts/AuthContext';
 import { useDailyCheckInDraft } from '../hooks/useDailyCheckInDraft';
 import { supabase } from '../lib/supabase';
@@ -469,25 +467,23 @@ export default function DailyCheckIn() {
 
   return (
     <MainLayout>
-      <div className="mx-auto max-w-6xl px-4 py-5 sm:px-6 lg:px-8">
-        <div className="grid gap-5 lg:grid-cols-[1.1fr_0.65fr]">
-          <div className="space-y-5">
+      <div className="mx-auto max-w-7xl px-4 py-4 sm:px-5 lg:px-6">
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1.38fr)_minmax(280px,0.62fr)]">
+          <div className="space-y-4">
             <div>
               <div className="clinical-chip clinical-chip-accent w-fit">
                 <ClipboardCheck className="h-3.5 w-3.5" />
                 Daily Check-In
               </div>
-              <h1 className="page-title mt-3">
+              <h1 className="clinical-page-title mt-3">
                 Log the whole day in one pass
               </h1>
-              <p className="page-subtitle mt-3 max-w-2xl">
+              <p className="clinical-page-subtitle mt-2 max-w-2xl">
                 This is the fastest way to give GutWise enough overlap across stool, food,
                 symptoms, hydration, sleep, stress, exercise, medication, and cycle data to find
                 clearer patterns.
               </p>
             </div>
-
-            <TrustExplainer variant="insights" />
 
             {message && (
               <div className="rounded-[var(--gw-radius-card)] border border-[rgba(91,184,240,0.18)] bg-[rgba(91,184,240,0.075)] p-4 text-body-sm text-[var(--gw-brand-200)]">
@@ -501,47 +497,8 @@ export default function DailyCheckIn() {
               </div>
             )}
 
-            <Card variant="elevated" className="overflow-hidden">
-              <div className="grid gap-4 md:grid-cols-3">
-                <div className="clinical-card p-4">
-                  <p className="data-kicker text-[var(--gw-brand-300)]">
-                    Included Today
-                  </p>
-                  <p className="mt-2 text-2xl font-semibold text-[var(--color-text-primary)]">
-                    {enabledSections.length}
-                  </p>
-                  <p className="mt-1 text-xs text-[var(--color-text-tertiary)]">
-                    sections enabled
-                  </p>
-                </div>
-                <div className="clinical-card p-4">
-                  <p className="data-kicker">
-                    Ready To Save
-                  </p>
-                  <p className="mt-2 text-2xl font-semibold text-[var(--color-text-primary)]">
-                    {completedCount}
-                  </p>
-                  <p className="mt-1 text-xs text-[var(--color-text-tertiary)]">
-                    sections with enough detail
-                  </p>
-                </div>
-                <div className="clinical-card p-4">
-                  <p className="data-kicker text-[var(--gw-intelligence-300)]">
-                    Best Signal
-                  </p>
-                  <p className="mt-2 text-body-md font-semibold text-[var(--color-text-primary)]">
-                    Overlap matters most
-                  </p>
-                  <p className="mt-1 text-xs leading-5 text-[var(--color-text-tertiary)]">
-                    Stool, symptoms, meals, hydration, sleep, and stress together create the
-                    strongest starting point.
-                  </p>
-                </div>
-              </div>
-            </Card>
-
-            <Card variant="elevated">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <Card variant="flat">
+              <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
                 <div className="flex-1">
                   <label
                     htmlFor="daily-logged-at"
@@ -557,11 +514,11 @@ export default function DailyCheckIn() {
                     className="input-base w-full"
                   />
                 </div>
-                <div className="flex flex-col gap-3 sm:flex-row">
-                  <Button variant="outline" onClick={resetDraft}>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:flex xl:flex-none">
+                  <Button variant="outline" onClick={resetDraft} className="w-full xl:w-auto">
                     Reset Draft
                   </Button>
-                  <Button onClick={handleSaveAll} disabled={savingAll}>
+                  <Button onClick={handleSaveAll} disabled={savingAll} className="w-full xl:w-auto">
                     <Save className="mr-2 inline h-4 w-4" />
                     {savingAll ? 'Saving...' : 'Save all sections'}
                   </Button>
@@ -569,7 +526,7 @@ export default function DailyCheckIn() {
               </div>
             </Card>
 
-            <Card variant="elevated">
+            <Card variant="flat">
               <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div>
                   <div className="clinical-chip w-fit text-[var(--color-text-secondary)]">
@@ -634,8 +591,8 @@ export default function DailyCheckIn() {
               </div>
             </Card>
 
-            <div className="space-y-5">
-              <Card>
+            <div className="space-y-4">
+              <Card variant="flat">
                 {renderSectionHeader('bowelMovement')}
                 <div className="mt-5 grid gap-4 md:grid-cols-2">
                   <div>
@@ -750,7 +707,7 @@ export default function DailyCheckIn() {
                 />
               </Card>
 
-              <Card>
+              <Card variant="flat">
                 {renderSectionHeader('symptoms')}
                 <div className="mt-5 grid gap-4 md:grid-cols-2">
                   <Field
@@ -812,7 +769,7 @@ export default function DailyCheckIn() {
                 />
               </Card>
 
-              <Card>
+              <Card variant="flat">
                 {renderSectionHeader('food')}
                 <div className="mt-5 grid gap-4 md:grid-cols-2">
                   <div>
@@ -869,7 +826,7 @@ export default function DailyCheckIn() {
                 <SectionActions saving={savingSection === 'food'} onSave={() => handleSaveSection('food')} />
               </Card>
 
-              <Card>
+              <Card variant="flat">
                 {renderSectionHeader('hydration')}
                 <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                   <NumberField
@@ -989,7 +946,7 @@ export default function DailyCheckIn() {
                 />
               </Card>
 
-              <Card>
+              <Card variant="flat">
                 {renderSectionHeader('sleep')}
                 <div className="mt-5 grid gap-4 md:grid-cols-2">
                   <DateTimeField
@@ -1043,7 +1000,7 @@ export default function DailyCheckIn() {
                 />
               </Card>
 
-              <Card>
+              <Card variant="flat">
                 {renderSectionHeader('stress')}
                 <div className="mt-5 grid gap-4 md:grid-cols-2">
                   <div>
@@ -1087,7 +1044,7 @@ export default function DailyCheckIn() {
                 />
               </Card>
 
-              <Card>
+              <Card variant="flat">
                 {renderSectionHeader('exercise')}
                 <div className="mt-5 grid gap-4 md:grid-cols-3">
                   <Field
@@ -1135,7 +1092,7 @@ export default function DailyCheckIn() {
                 />
               </Card>
 
-              <Card>
+              <Card variant="flat">
                 {renderSectionHeader('medication')}
                 <div className="mt-5 grid gap-4 md:grid-cols-3">
                   <Field
@@ -1181,7 +1138,7 @@ export default function DailyCheckIn() {
                 />
               </Card>
 
-              <Card>
+              <Card variant="flat">
                 {renderSectionHeader('menstrualCycle')}
                 <div className="mt-5 grid gap-4 md:grid-cols-2">
                   <div>
@@ -1264,28 +1221,31 @@ export default function DailyCheckIn() {
             </div>
           </div>
 
-          <div className="space-y-5">
-            <Card variant="elevated">
+          <div className="space-y-4">
+            <Card variant="flat">
               <div className="flex items-start gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-[var(--gw-radius-lg)] bg-[rgba(139,92,246,0.1)] text-[var(--gw-intelligence-300)]">
-                  <Sparkles className="h-5 w-5" />
+                  <ClipboardCheck className="h-5 w-5" />
                 </div>
                 <div>
                   <h2 className="text-body-md font-semibold text-[var(--color-text-primary)]">
                     What to log first
                   </h2>
                   <p className="mt-2 text-body-sm leading-6 text-[var(--color-text-secondary)]">
-                    If you want the strongest first insights, start with stool, symptoms, meals,
+                    For the strongest starting context, start with stool, symptoms, meals,
                     hydration, sleep, and stress.
                   </p>
                 </div>
               </div>
             </Card>
 
-            <Card>
+            <Card variant="flat">
               <h2 className="text-body-md font-semibold text-[var(--color-text-primary)]">
                 Today&apos;s progress
               </h2>
+              <p className="mt-1 text-xs leading-5 text-[var(--color-text-tertiary)]">
+                {enabledSections.length} enabled, {completedCount} ready to save.
+              </p>
               <div className="mt-4 space-y-3">
                 {sectionMeta.map((section) => {
                   const enabled = draft[section.key].enabled;
@@ -1326,7 +1286,7 @@ export default function DailyCheckIn() {
               </div>
             </Card>
 
-            <Card>
+            <Card variant="flat">
               <h2 className="text-body-md font-semibold text-[var(--color-text-primary)]">
                 None history
               </h2>
@@ -1352,8 +1312,6 @@ export default function DailyCheckIn() {
                 )}
               </div>
             </Card>
-
-            <TrustExplainer variant="documents" />
           </div>
         </div>
       </div>

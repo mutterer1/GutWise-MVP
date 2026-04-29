@@ -8,7 +8,6 @@ import {
   Gauge,
   Pencil,
   Save,
-  Sparkles,
   Tag,
   Utensils,
 } from 'lucide-react';
@@ -84,7 +83,7 @@ function getMealSignalLabel(itemCount: number, tagCount: number, hasNotes: boole
   if (itemCount === 0) return 'Awaiting intake';
   if (itemCount > 0 && (tagCount > 0 || hasNotes)) return 'Context rich';
   if (itemCount > 1) return 'Meal captured';
-  return 'Basic signal';
+  return 'Basic entry';
 }
 
 export default function FoodLog() {
@@ -262,9 +261,9 @@ export default function FoodLog() {
 
   return (
     <LogPageShell
-      title="Food Signal Capture"
+      title="Food Log"
       subtitle="Capture what you ate first. GutWise can enrich reference matches and queue unknown foods for review without forcing every detail up front."
-      eyebrow="Food Intelligence Capture"
+      eyebrow="Food entry"
       icon={<Utensils className="h-3.5 w-3.5" />}
       maxWidth="7xl"
       message={message}
@@ -300,15 +299,15 @@ export default function FoodLog() {
             </div>
           )}
 
-          <div className="grid gap-5 xl:grid-cols-[1.42fr_0.78fr]">
-            <section className="log-input-shell p-5 sm:p-6">
+          <div className="log-workflow-grid">
+            <section className="log-primary-panel">
               <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div>
-                  <span className="signal-badge signal-badge-major mb-4">
-                    <Sparkles className="h-3.5 w-3.5" />
-                    Capture Console
+                  <span className="clinical-chip clinical-chip-intelligence mb-3">
+                    <Activity className="h-3.5 w-3.5" />
+                    Food details
                   </span>
-                  <h2 className="text-3xl font-semibold tracking-[-0.04em] text-[var(--color-text-primary)]">
+                  <h2 className="log-section-title">
                     What did you eat?
                   </h2>
                   <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--color-text-secondary)]">
@@ -317,8 +316,8 @@ export default function FoodLog() {
                   </p>
                 </div>
 
-                <div className="rounded-[22px] border border-[rgba(197,168,255,0.16)] bg-white/[0.035] px-4 py-3">
-                  <p className="data-kicker">Current signal</p>
+                <div className="log-readout">
+                  <p className="data-kicker">Current entry</p>
                   <p className="mt-1 text-lg font-semibold tracking-[-0.03em] text-[var(--color-text-primary)]">
                     {mealSignalLabel}
                   </p>
@@ -332,9 +331,9 @@ export default function FoodLog() {
                     type="button"
                     onClick={() => setFormData({ ...formData, meal_type: type.value })}
                     className={[
-                      'group rounded-[24px] border p-4 text-left transition-smooth',
+                      'log-option-card group',
                       formData.meal_type === type.value
-                        ? 'border-[rgba(197,168,255,0.34)] bg-[rgba(139,92,246,0.16)] shadow-[0_0_30px_rgba(139,92,246,0.14)]'
+                        ? 'border-[rgba(197,168,255,0.28)] bg-[rgba(139,92,246,0.12)]'
                         : 'border-white/10 bg-white/[0.026] hover:border-[rgba(197,168,255,0.2)] hover:bg-white/[0.045]',
                     ].join(' ')}
                   >
@@ -351,7 +350,7 @@ export default function FoodLog() {
                 ))}
               </div>
 
-              <div className="rounded-[28px] border border-[rgba(197,168,255,0.16)] bg-[rgba(7,10,24,0.34)] p-4 sm:p-5">
+              <div className="log-section-card">
                 <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                   <div>
                     <p className="data-kicker">Food items</p>
@@ -359,7 +358,7 @@ export default function FoodLog() {
                       Search reference foods or add a custom item.
                     </p>
                   </div>
-                  <span className="signal-badge signal-badge-daily">
+                  <span className="clinical-chip">
                     {formData.food_items.length} item{formData.food_items.length === 1 ? '' : 's'}
                   </span>
                 </div>
@@ -409,7 +408,7 @@ export default function FoodLog() {
                   <div className="empty-signal-state px-5 py-8 text-center">
                     <Utensils className="mx-auto h-8 w-8 text-[var(--gw-intelligence-300)]" />
                     <p className="mt-3 text-sm font-semibold text-[var(--color-text-primary)]">
-                      No food signal yet
+                      No food item yet
                     </p>
                     <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[var(--color-text-secondary)]">
                       Add at least one food item to save the entry and trigger reference
@@ -420,11 +419,11 @@ export default function FoodLog() {
               </div>
             </section>
 
-            <aside className="signal-card signal-card-major h-fit p-5 sm:p-6 xl:sticky xl:top-6">
+            <aside className="log-summary-panel">
               <div className="mb-5 flex items-start justify-between gap-4">
                 <div>
-                  <p className="data-kicker">Meal Signal</p>
-                  <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em] text-[var(--color-text-primary)] capitalize">
+                  <p className="data-kicker">Meal summary</p>
+                  <h2 className="log-summary-title capitalize">
                     {formData.meal_type}
                   </h2>
                 </div>
@@ -452,13 +451,13 @@ export default function FoodLog() {
                 </label>
 
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
+                  <div className="log-summary-note">
                     <p className="metric-label">Items</p>
                     <p className="metric-value mt-2 text-[2.25rem]">
                       {formData.food_items.length}
                     </p>
                   </div>
-                  <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
+                  <div className="log-summary-note">
                     <p className="metric-label">Est. Calories</p>
                     <p className="metric-value mt-2 text-[2.25rem]">
                       {totalEstimatedCalories > 0 ? totalEstimatedCalories : '--'}
@@ -466,7 +465,7 @@ export default function FoodLog() {
                   </div>
                 </div>
 
-                <div className="rounded-2xl border border-[rgba(197,168,255,0.16)] bg-white/[0.035] p-4">
+                <div className="log-summary-note">
                   <p className="data-kicker">Reference behavior</p>
                   <p className="mt-2 text-sm leading-6 text-[var(--color-text-secondary)]">
                     Matched foods can carry estimates forward. Custom foods that do not match the
@@ -482,7 +481,7 @@ export default function FoodLog() {
                     className="w-full"
                   >
                     <Save className="mr-2 inline h-4 w-4" />
-                    {saving ? 'Saving...' : editingId ? 'Update Entry' : 'Save Food Signal'}
+                    {saving ? 'Saving...' : editingId ? 'Update Entry' : 'Save entry'}
                   </Button>
 
                   {editingId && (
@@ -495,7 +494,7 @@ export default function FoodLog() {
             </aside>
           </div>
 
-          <section className="rounded-[28px] border border-[rgba(197,168,255,0.14)] bg-white/[0.026] px-4 py-3 sm:px-5">
+          <section className="log-disclosure-panel">
             <button
               type="button"
               onClick={() => setShowDetails(!showDetails)}
@@ -518,7 +517,7 @@ export default function FoodLog() {
             </button>
 
             {showDetails && (
-              <div className="mt-5 grid gap-6 border-t border-white/8 pt-5 xl:grid-cols-[0.75fr_1.25fr]">
+              <div className="log-disclosure-content grid gap-5 xl:grid-cols-[0.75fr_1.25fr]">
                 <div>
                   <label className="field-label mb-3 block">Portion Size</label>
                   <div className="grid grid-cols-2 gap-3">
@@ -528,7 +527,7 @@ export default function FoodLog() {
                         type="button"
                         onClick={() => setFormData({ ...formData, portion_size: size })}
                         className={[
-                          'rounded-[20px] border px-3 py-3 text-sm font-semibold transition-smooth',
+                          'log-option-button',
                           formData.portion_size === size
                             ? 'border-[rgba(197,168,255,0.32)] bg-[rgba(139,92,246,0.14)] text-[var(--gw-intelligence-200)]'
                             : 'border-white/10 bg-white/[0.026] text-[var(--color-text-secondary)] hover:border-[rgba(197,168,255,0.2)] hover:bg-white/[0.045]',
@@ -544,7 +543,7 @@ export default function FoodLog() {
                   <div className="mb-3 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
                     <label className="field-label block">Optional Digestive Markers</label>
                     <span className="text-xs text-[var(--color-text-tertiary)]">
-                      Use only when you know it improves the signal.
+                      Use only when it improves the entry.
                     </span>
                   </div>
 
@@ -586,7 +585,7 @@ export default function FoodLog() {
           </section>
         </form>
       ) : (
-        <section className="surface-panel rounded-[32px] p-5 sm:p-6">
+        <section className="log-history-panel">
           {history.length === 0 ? (
             <EmptyState
               category="food"
@@ -596,7 +595,7 @@ export default function FoodLog() {
             <div className="space-y-5">
               <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                 <div>
-                  <span className="signal-badge signal-badge-daily mb-3">
+                  <span className="clinical-chip mb-3">
                     <Clock className="h-3.5 w-3.5" />
                     Food Timeline
                   </span>
@@ -604,7 +603,7 @@ export default function FoodLog() {
                     Reuse or inspect previous meals
                   </h2>
                 </div>
-                <span className="signal-badge signal-badge-major">
+                <span className="clinical-chip clinical-chip-intelligence">
                   {history.length} saved
                 </span>
               </div>
@@ -632,7 +631,7 @@ export default function FoodLog() {
                         return (
                           <div
                             key={log.id}
-                            className="rounded-[24px] border border-[rgba(197,168,255,0.13)] bg-white/[0.035] p-4 transition-smooth hover:border-[rgba(197,168,255,0.22)] hover:bg-white/[0.05]"
+                            className="log-section-card transition-smooth hover:border-[rgba(197,168,255,0.22)] hover:bg-white/[0.05]"
                           >
                             <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                               <div>

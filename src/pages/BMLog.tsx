@@ -8,7 +8,6 @@ import {
   Gauge,
   Pencil,
   Save,
-  Sparkles,
   Waves,
 } from 'lucide-react';
 import Button from '../components/Button';
@@ -100,8 +99,8 @@ function hasNonDefaultDetails(formData: BMFormData): boolean {
 function getBristolSignal(type: number) {
   if (type === 4) return 'Reference pattern';
   if (type >= 3 && type <= 5) return 'Typical range';
-  if (type <= 2) return 'Constipation signal';
-  return 'Loose stool signal';
+  if (type <= 2) return 'Constipation pattern';
+  return 'Loose stool pattern';
 }
 
 export default function BMLog() {
@@ -173,9 +172,9 @@ export default function BMLog() {
 
   return (
     <LogPageShell
-      title="Bowel Signal Capture"
-      subtitle="Capture the bowel event quickly, then add urgency, pain, difficulty, and flags only when the signal needs more clinical context."
-      eyebrow="Gut Output Capture"
+      title="Bowel Movement Log"
+      subtitle="Capture the bowel event quickly, then add urgency, pain, difficulty, and flags only when the entry needs more clinical context."
+      eyebrow="Bowel movement entry"
       icon={<Waves className="h-3.5 w-3.5" />}
       maxWidth="7xl"
       message={message}
@@ -198,24 +197,24 @@ export default function BMLog() {
             <EditingBanner onCancel={handleReset} label="Editing bowel entry" />
           )}
 
-          <div className="grid gap-5 xl:grid-cols-[1.42fr_0.78fr]">
-            <section className="log-input-shell p-5 sm:p-6">
+          <div className="log-workflow-grid">
+            <section className="log-primary-panel">
               <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div>
-                  <span className="signal-badge signal-badge-major mb-4">
-                    <Sparkles className="h-3.5 w-3.5" />
-                    Stool Scale Console
+                  <span className="clinical-chip clinical-chip-intelligence mb-3">
+                    <Activity className="h-3.5 w-3.5" />
+                    Stool scale
                   </span>
-                  <h2 className="text-3xl font-semibold tracking-[-0.04em] text-[var(--color-text-primary)]">
+                  <h2 className="log-section-title">
                     What was the closest match?
                   </h2>
                   <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--color-text-secondary)]">
-                    Start with Bristol type and amount. This gives the insight engine a clean
-                    output signal before optional details are added.
+                    Start with Bristol type and amount. This gives the entry a clean baseline
+                    before optional details are added.
                   </p>
                 </div>
 
-                <div className="rounded-[22px] border border-[rgba(197,168,255,0.16)] bg-white/[0.035] px-4 py-3">
+                <div className="log-readout">
                   <p className="data-kicker">Current read</p>
                   <p className="mt-1 text-lg font-semibold tracking-[-0.03em] text-[var(--color-text-primary)]">
                     {getBristolSignal(formData.bristol_type)}
@@ -231,9 +230,9 @@ export default function BMLog() {
                       type="button"
                       onClick={() => setFormData({ ...formData, bristol_type: item.value })}
                       className={[
-                        'group flex min-h-[178px] flex-col items-center justify-start rounded-[24px] border px-3 py-4 text-center transition-smooth',
+                        'log-bristol-option group',
                         formData.bristol_type === item.value
-                          ? 'border-[rgba(197,168,255,0.34)] bg-[rgba(139,92,246,0.16)] shadow-[0_0_32px_rgba(139,92,246,0.16)]'
+                          ? 'border-[rgba(197,168,255,0.28)] bg-[rgba(139,92,246,0.12)]'
                           : 'border-white/10 bg-white/[0.026] hover:border-[rgba(197,168,255,0.22)] hover:bg-white/[0.045]',
                       ].join(' ')}
                     >
@@ -251,7 +250,7 @@ export default function BMLog() {
                 </div>
               </div>
 
-              <div className="mt-5 rounded-[28px] border border-[rgba(197,168,255,0.16)] bg-[rgba(7,10,24,0.34)] p-4 sm:p-5">
+              <div className="mt-5 log-section-card">
                 <div className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
                   <div>
                     <p className="data-kicker">Amount</p>
@@ -259,7 +258,7 @@ export default function BMLog() {
                       Keep this simple unless the event was unusual.
                     </p>
                   </div>
-                  <span className="signal-badge signal-badge-daily capitalize">
+                  <span className="clinical-chip capitalize">
                     {formData.amount}
                   </span>
                 </div>
@@ -271,7 +270,7 @@ export default function BMLog() {
                       type="button"
                       onClick={() => setFormData({ ...formData, amount: size })}
                       className={[
-                        'rounded-[22px] border px-4 py-5 text-center text-sm font-semibold capitalize transition-smooth',
+                        'log-option-button capitalize',
                         formData.amount === size
                           ? 'border-[rgba(197,168,255,0.32)] bg-[rgba(139,92,246,0.14)] text-[var(--gw-intelligence-200)]'
                           : 'border-white/10 bg-white/[0.026] text-[var(--color-text-secondary)] hover:border-[rgba(197,168,255,0.2)] hover:bg-white/[0.045]',
@@ -284,11 +283,11 @@ export default function BMLog() {
               </div>
             </section>
 
-            <aside className="signal-card signal-card-major h-fit p-5 sm:p-6 xl:sticky xl:top-6">
+            <aside className="log-summary-panel">
               <div className="mb-5 flex items-start justify-between gap-4">
                 <div>
-                  <p className="data-kicker">Bowel Signal</p>
-                  <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em] text-[var(--color-text-primary)]">
+                  <p className="data-kicker">Bowel summary</p>
+                  <h2 className="log-summary-title">
                     Bristol Type {formData.bristol_type}
                   </h2>
                 </div>
@@ -320,7 +319,7 @@ export default function BMLog() {
                   <SummaryMetric label="Flags" value={`${redFlagCount}`} />
                 </div>
 
-                <div className="rounded-2xl border border-[rgba(197,168,255,0.16)] bg-white/[0.035] p-4">
+                <div className="log-summary-note">
                   <p className="data-kicker">Scale meaning</p>
                   <p className="mt-2 text-sm leading-6 text-[var(--color-text-secondary)]">
                     {selectedBristol?.desc ?? 'Choose the closest Bristol type.'}
@@ -329,7 +328,7 @@ export default function BMLog() {
 
                 <Button type="submit" disabled={saving} size="lg" className="w-full">
                   <Save className="mr-2 inline h-4 w-4" />
-                  {saving ? 'Saving...' : editingId ? 'Update Entry' : 'Save Bowel Signal'}
+                  {saving ? 'Saving...' : editingId ? 'Update Entry' : 'Save entry'}
                 </Button>
 
                 {editingId && (
@@ -341,7 +340,7 @@ export default function BMLog() {
             </aside>
           </div>
 
-          <section className="rounded-[28px] border border-[rgba(197,168,255,0.14)] bg-white/[0.026] px-4 py-3 sm:px-5">
+          <section className="log-disclosure-panel">
             <button
               type="button"
               onClick={() => setShowDetails(!showDetails)}
@@ -364,7 +363,7 @@ export default function BMLog() {
             </button>
 
             {showDetails && (
-              <div className="mt-5 space-y-6 border-t border-white/8 pt-5">
+              <div className="log-disclosure-content space-y-5">
                 <div className="grid gap-5 md:grid-cols-3">
                   <SliderField
                     label="Urgency"
@@ -442,7 +441,7 @@ export default function BMLog() {
           </section>
         </form>
       ) : (
-        <section className="surface-panel rounded-[32px] p-5 sm:p-6">
+        <section className="log-history-panel">
           {history.length === 0 ? (
             <EmptyState
               category="bm"
@@ -467,7 +466,7 @@ export default function BMLog() {
                       {group.entries.map((log) => (
                         <div
                           key={log.id}
-                          className="rounded-[24px] border border-[rgba(197,168,255,0.13)] bg-white/[0.035] p-4 transition-smooth hover:border-[rgba(197,168,255,0.22)] hover:bg-white/[0.05]"
+                          className="log-section-card transition-smooth hover:border-[rgba(197,168,255,0.22)] hover:bg-white/[0.05]"
                         >
                           <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                             <div>
@@ -560,7 +559,7 @@ function SliderField({
   high: string;
 }) {
   return (
-    <div className="rounded-[24px] border border-[rgba(197,168,255,0.14)] bg-white/[0.035] p-4">
+    <div className="log-section-card">
       <label className="field-label mb-2 block">
         {label}:{' '}
         <span className="font-semibold text-[var(--gw-intelligence-200)]">{value.toFixed(1)}</span>
@@ -594,7 +593,7 @@ function ToggleField({
   onToggle: () => void;
 }) {
   return (
-    <div className="flex items-center justify-between rounded-[24px] border border-[rgba(197,168,255,0.14)] bg-white/[0.035] p-4">
+    <div className="flex items-center justify-between log-section-card">
       <span className="text-sm font-semibold text-[var(--color-text-secondary)]">{label}</span>
 
       <button
@@ -618,7 +617,7 @@ function ToggleField({
 
 function SummaryMetric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
+    <div className="log-summary-note">
       <p className="metric-label">{label}</p>
       <p className="metric-value mt-2 text-[2.25rem] capitalize">{value}</p>
     </div>

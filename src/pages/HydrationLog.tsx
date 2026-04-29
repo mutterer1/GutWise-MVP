@@ -8,7 +8,6 @@ import {
   Gauge,
   Pencil,
   Save,
-  Sparkles,
   Zap,
 } from 'lucide-react';
 import Button from '../components/Button';
@@ -274,9 +273,9 @@ export default function HydrationLog() {
 
   return (
     <LogPageShell
-      title="Hydration Signal Capture"
-      subtitle="Separate water-goal progress, total fluids, caffeine, electrolytes, and alcohol so hydration context can feed the insight engine accurately."
-      eyebrow="Hydration Intelligence Capture"
+      title="Hydration Log"
+      subtitle="Separate water-goal progress, total fluids, caffeine, electrolytes, and alcohol so hydration context stays accurate."
+      eyebrow="Hydration entry"
       icon={<Droplet className="h-3.5 w-3.5" />}
       maxWidth="7xl"
       message={message}
@@ -297,15 +296,15 @@ export default function HydrationLog() {
         <form onSubmit={handleSubmit} className="space-y-5">
           {editingId && <EditingBanner label="Editing hydration entry" onCancel={handleReset} />}
 
-          <div className="grid gap-5 xl:grid-cols-[1.42fr_0.78fr]">
-            <section className="log-input-shell p-5 sm:p-6">
+          <div className="log-workflow-grid">
+            <section className="log-primary-panel">
               <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div>
-                  <span className="signal-badge signal-badge-major mb-4">
-                    <Sparkles className="h-3.5 w-3.5" />
-                    Hydration Console
+                  <span className="clinical-chip clinical-chip-intelligence mb-3">
+                    <Activity className="h-3.5 w-3.5" />
+                    Hydration details
                   </span>
-                  <h2 className="text-3xl font-semibold tracking-[-0.04em] text-[var(--color-text-primary)]">
+                  <h2 className="log-section-title">
                     What did you drink?
                   </h2>
                   <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--color-text-secondary)]">
@@ -314,7 +313,7 @@ export default function HydrationLog() {
                   </p>
                 </div>
 
-                <div className="rounded-[22px] border border-[rgba(197,168,255,0.16)] bg-white/[0.035] px-4 py-3">
+                <div className="log-readout">
                   <p className="data-kicker">Current model</p>
                   <p className="mt-1 text-lg font-semibold tracking-[-0.03em] text-[var(--color-text-primary)]">
                     {hydrationModelLabel}
@@ -322,7 +321,7 @@ export default function HydrationLog() {
                 </div>
               </div>
 
-              <div className="rounded-[28px] border border-[rgba(197,168,255,0.16)] bg-[rgba(7,10,24,0.34)] p-4 sm:p-5">
+              <div className="log-section-card">
                 <div className="mb-4">
                   <p className="data-kicker">Beverage Type</p>
                   <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
@@ -337,7 +336,7 @@ export default function HydrationLog() {
                       type="button"
                       onClick={() => handleBeverageTypeChange(type.value)}
                       className={[
-                        'group rounded-[22px] border p-4 text-left transition-smooth',
+                        'log-option-card group',
                         formData.beverage_type === type.value
                           ? 'border-[rgba(197,168,255,0.32)] bg-[rgba(139,92,246,0.14)] text-[var(--gw-intelligence-200)]'
                           : 'border-white/10 bg-white/[0.026] text-[var(--color-text-secondary)] hover:border-[rgba(197,168,255,0.2)] hover:bg-white/[0.045]',
@@ -361,7 +360,7 @@ export default function HydrationLog() {
                 </div>
               </div>
 
-              <div className="mt-5 rounded-[28px] border border-[rgba(197,168,255,0.16)] bg-white/[0.035] p-4 sm:p-5">
+              <div className="mt-5 log-section-card">
                 <div className="mb-4 flex items-center justify-between gap-4">
                   <div>
                     <p className="data-kicker">Amount</p>
@@ -396,7 +395,7 @@ export default function HydrationLog() {
                       type="button"
                       onClick={() => handleQuickAmount(amount)}
                       className={[
-                        'rounded-[20px] border p-3 transition-smooth',
+                        'log-option-button',
                         isQuickSelected(amount)
                           ? 'border-[rgba(197,168,255,0.32)] bg-[rgba(139,92,246,0.14)]'
                           : 'border-white/10 bg-white/[0.026] hover:border-[rgba(197,168,255,0.2)] hover:bg-white/[0.045]',
@@ -426,11 +425,11 @@ export default function HydrationLog() {
               </div>
             </section>
 
-            <aside className="signal-card signal-card-major h-fit p-5 sm:p-6 xl:sticky xl:top-6">
+            <aside className="log-summary-panel">
               <div className="mb-5 flex items-start justify-between gap-4">
                 <div>
-                  <p className="data-kicker">Fluid Signal</p>
-                  <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em] text-[var(--color-text-primary)]">
+                  <p className="data-kicker">Fluid summary</p>
+                  <h2 className="log-summary-title">
                     {formatHydrationAmount(formData.amount_ml, unit)}
                   </h2>
                 </div>
@@ -468,7 +467,7 @@ export default function HydrationLog() {
                   />
                 </div>
 
-                <div className="rounded-2xl border border-[rgba(197,168,255,0.16)] bg-white/[0.035] p-4">
+                <div className="log-summary-note">
                   <p className="data-kicker">Classification</p>
                   <p className="mt-2 text-sm leading-6 text-[var(--color-text-secondary)]">
                     {formData.beverage_type}
@@ -485,7 +484,7 @@ export default function HydrationLog() {
 
                 <Button type="submit" disabled={saving} size="lg" className="w-full">
                   <Save className="mr-2 inline h-4 w-4" />
-                  {saving ? 'Saving...' : editingId ? 'Update Entry' : 'Save Hydration Signal'}
+                  {saving ? 'Saving...' : editingId ? 'Update Entry' : 'Save entry'}
                 </Button>
 
                 {editingId && (
@@ -497,7 +496,7 @@ export default function HydrationLog() {
             </aside>
           </div>
 
-          <section className="rounded-[28px] border border-[rgba(197,168,255,0.14)] bg-white/[0.026] px-4 py-3 sm:px-5">
+          <section className="log-disclosure-panel">
             <button
               type="button"
               onClick={() => setShowModifiers(!showModifiers)}
@@ -520,8 +519,8 @@ export default function HydrationLog() {
             </button>
 
             {showModifiers && (
-              <div className="mt-5 grid gap-6 border-t border-white/8 pt-5 lg:grid-cols-[0.8fr_1.2fr]">
-                <div className="rounded-[24px] border border-[rgba(197,168,255,0.14)] bg-white/[0.035] p-4">
+              <div className="log-disclosure-content grid gap-5 lg:grid-cols-[0.8fr_1.2fr]">
+                <div className="log-section-card">
                   <div className="mb-3 flex items-center justify-between gap-3">
                     <div>
                       <p className="text-sm font-semibold text-[var(--color-text-secondary)]">
@@ -582,7 +581,7 @@ export default function HydrationLog() {
           </section>
         </form>
       ) : (
-        <section className="surface-panel rounded-[32px] p-5 sm:p-6">
+        <section className="log-history-panel">
           {history.length === 0 ? (
             <EmptyState
               category="hydration"
@@ -607,7 +606,7 @@ export default function HydrationLog() {
                       {group.entries.map((log) => (
                         <div
                           key={log.id}
-                          className="rounded-[24px] border border-[rgba(197,168,255,0.13)] bg-white/[0.035] p-4 transition-smooth hover:border-[rgba(197,168,255,0.22)] hover:bg-white/[0.05]"
+                          className="log-section-card transition-smooth hover:border-[rgba(197,168,255,0.22)] hover:bg-white/[0.05]"
                         >
                           <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                             <div>
@@ -694,7 +693,7 @@ function EditingBanner({ label, onCancel }: { label: string; onCancel: () => voi
 
 function SummaryMetric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
+    <div className="log-summary-note">
       <p className="metric-label">{label}</p>
       <p className="mt-2 text-lg font-semibold tracking-[-0.03em] text-[var(--color-text-primary)]">
         {value}

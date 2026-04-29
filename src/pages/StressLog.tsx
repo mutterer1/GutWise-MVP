@@ -9,7 +9,6 @@ import {
   Gauge,
   Pencil,
   Save,
-  Sparkles,
 } from 'lucide-react';
 import Button from '../components/Button';
 import EmptyState from '../components/EmptyState';
@@ -170,9 +169,9 @@ export default function StressLog() {
 
   return (
     <LogPageShell
-      title="Stress Signal Capture"
-      subtitle="Capture the stress load first, then add triggers, regulation methods, and physical spillover only when they make the signal more useful."
-      eyebrow="Nervous System Intelligence Capture"
+      title="Stress Log"
+      subtitle="Capture the stress load first, then add triggers, regulation methods, and physical spillover only when they make the entry more useful."
+      eyebrow="Stress entry"
       icon={<Frown className="h-3.5 w-3.5" />}
       maxWidth="7xl"
       message={message}
@@ -193,15 +192,15 @@ export default function StressLog() {
         <form onSubmit={handleSubmit} className="space-y-5">
           {editingId && <EditingBanner label="Editing stress entry" onCancel={handleReset} />}
 
-          <div className="grid gap-5 xl:grid-cols-[1.42fr_0.78fr]">
-            <section className="log-input-shell p-5 sm:p-6">
+          <div className="log-workflow-grid">
+            <section className="log-primary-panel">
               <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div>
-                  <span className="signal-badge signal-badge-major mb-4">
-                    <Sparkles className="h-3.5 w-3.5" />
-                    Stress Console
+                  <span className="clinical-chip clinical-chip-intelligence mb-3">
+                    <Activity className="h-3.5 w-3.5" />
+                    Stress level
                   </span>
-                  <h2 className="text-3xl font-semibold tracking-[-0.04em] text-[var(--color-text-primary)]">
+                  <h2 className="log-section-title">
                     How heavy is the load?
                   </h2>
                   <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--color-text-secondary)]">
@@ -210,7 +209,7 @@ export default function StressLog() {
                   </p>
                 </div>
 
-                <div className="rounded-[22px] border border-[rgba(197,168,255,0.16)] bg-white/[0.035] px-4 py-3">
+                <div className="log-readout">
                   <p className="data-kicker">Current posture</p>
                   <p className="mt-1 text-lg font-semibold tracking-[-0.03em] text-[var(--color-text-primary)]">
                     {stressLabel}
@@ -218,7 +217,7 @@ export default function StressLog() {
                 </div>
               </div>
 
-              <div className="rounded-[28px] border border-[rgba(197,168,255,0.16)] bg-[rgba(7,10,24,0.34)] p-5 sm:p-6">
+              <div className="log-section-card">
                 <div className="mb-6 grid gap-4 lg:grid-cols-[0.68fr_0.32fr] lg:items-end">
                   <div>
                     <p className="data-kicker">Stress Level</p>
@@ -254,11 +253,11 @@ export default function StressLog() {
               </div>
             </section>
 
-            <aside className="signal-card signal-card-major h-fit p-5 sm:p-6 xl:sticky xl:top-6">
+            <aside className="log-summary-panel">
               <div className="mb-5 flex items-start justify-between gap-4">
                 <div>
-                  <p className="data-kicker">Stress Signal</p>
-                  <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em] text-[var(--color-text-primary)]">
+                  <p className="data-kicker">Stress summary</p>
+                  <h2 className="log-summary-title">
                     {stressLabel}
                   </h2>
                 </div>
@@ -290,7 +289,7 @@ export default function StressLog() {
                   <SummaryMetric label="Coping" value={`${formData.coping_methods.length}`} />
                 </div>
 
-                <div className="rounded-2xl border border-[rgba(197,168,255,0.16)] bg-white/[0.035] p-4">
+                <div className="log-summary-note">
                   <p className="data-kicker">Body spillover</p>
                   <p className="mt-2 text-sm leading-6 text-[var(--color-text-secondary)]">
                     {formData.physical_symptoms.length > 0
@@ -301,7 +300,7 @@ export default function StressLog() {
 
                 <Button type="submit" disabled={saving} size="lg" className="w-full">
                   <Save className="mr-2 inline h-4 w-4" />
-                  {saving ? 'Saving...' : editingId ? 'Update Entry' : 'Save Stress Signal'}
+                  {saving ? 'Saving...' : editingId ? 'Update Entry' : 'Save entry'}
                 </Button>
 
                 {editingId && (
@@ -313,7 +312,7 @@ export default function StressLog() {
             </aside>
           </div>
 
-          <section className="rounded-[28px] border border-[rgba(197,168,255,0.14)] bg-white/[0.026] px-4 py-3 sm:px-5">
+          <section className="log-disclosure-panel">
             <button
               type="button"
               onClick={() => setShowDetails(!showDetails)}
@@ -336,7 +335,7 @@ export default function StressLog() {
             </button>
 
             {showDetails && (
-              <div className="mt-5 space-y-6 border-t border-white/8 pt-5">
+              <div className="log-disclosure-content space-y-5">
                 <ChipSection
                   label="Triggers"
                   description="Potential source of the load."
@@ -395,7 +394,7 @@ export default function StressLog() {
           </section>
         </form>
       ) : (
-        <section className="surface-panel rounded-[32px] p-5 sm:p-6">
+        <section className="log-history-panel">
           {history.length === 0 ? (
             <EmptyState
               category="stress"
@@ -420,7 +419,7 @@ export default function StressLog() {
                       {group.entries.map((log) => (
                         <div
                           key={log.id}
-                          className="rounded-[24px] border border-[rgba(197,168,255,0.13)] bg-white/[0.035] p-4 transition-smooth hover:border-[rgba(197,168,255,0.22)] hover:bg-white/[0.05]"
+                          className="log-section-card transition-smooth hover:border-[rgba(197,168,255,0.22)] hover:bg-white/[0.05]"
                         >
                           <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                             <div>
@@ -514,13 +513,13 @@ function ChipSection({
   onToggle: (value: string) => void;
 }) {
   return (
-    <div className="rounded-[24px] border border-[rgba(197,168,255,0.14)] bg-white/[0.035] p-4">
+    <div className="log-section-card">
       <div className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="data-kicker">{label}</p>
           <p className="mt-1 text-sm text-[var(--color-text-secondary)]">{description}</p>
         </div>
-        <span className="signal-badge signal-badge-daily">{selected.length} selected</span>
+        <span className="clinical-chip">{selected.length} selected</span>
       </div>
 
       <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
@@ -530,7 +529,7 @@ function ChipSection({
             type="button"
             onClick={() => onToggle(option)}
             className={[
-              'rounded-[20px] border px-3 py-3 text-sm font-semibold transition-smooth',
+              'log-option-button',
               selected.includes(option)
                 ? 'border-[rgba(197,168,255,0.32)] bg-[rgba(139,92,246,0.14)] text-[var(--gw-intelligence-200)]'
                 : 'border-white/10 bg-white/[0.026] text-[var(--color-text-secondary)] hover:border-[rgba(197,168,255,0.2)] hover:bg-white/[0.045]',
@@ -546,7 +545,7 @@ function ChipSection({
 
 function SummaryMetric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
+    <div className="log-summary-note">
       <p className="metric-label">{label}</p>
       <p className="metric-value mt-2 text-[2rem]">{value}</p>
     </div>

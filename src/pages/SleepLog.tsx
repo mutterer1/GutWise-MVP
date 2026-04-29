@@ -8,7 +8,6 @@ import {
   Moon,
   Pencil,
   Save,
-  Sparkles,
 } from 'lucide-react';
 import Button from '../components/Button';
 import EmptyState from '../components/EmptyState';
@@ -171,9 +170,9 @@ export default function SleepLog() {
 
   return (
     <LogPageShell
-      title="Sleep Recovery Capture"
+      title="Sleep Log"
       subtitle="Capture sleep window, quality, interruptions, and subjective recovery so rest can be compared against gut symptoms, stress, hydration, food, and medication timing."
-      eyebrow="Recovery Intelligence Capture"
+      eyebrow="Sleep entry"
       icon={<Moon className="h-3.5 w-3.5" />}
       maxWidth="7xl"
       message={message}
@@ -194,15 +193,15 @@ export default function SleepLog() {
         <form onSubmit={handleFormSubmit} className="space-y-5">
           {editingId && <EditingBanner label="Editing sleep entry" onCancel={handleReset} />}
 
-          <div className="grid gap-5 xl:grid-cols-[1.42fr_0.78fr]">
-            <section className="log-input-shell p-5 sm:p-6">
+          <div className="log-workflow-grid">
+            <section className="log-primary-panel">
               <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div>
-                  <span className="signal-badge signal-badge-major mb-4">
-                    <Sparkles className="h-3.5 w-3.5" />
-                    Sleep Window Console
+                  <span className="clinical-chip clinical-chip-intelligence mb-3">
+                    <Activity className="h-3.5 w-3.5" />
+                    Sleep window
                   </span>
-                  <h2 className="text-3xl font-semibold tracking-[-0.04em] text-[var(--color-text-primary)]">
+                  <h2 className="log-section-title">
                     When did recovery happen?
                   </h2>
                   <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--color-text-secondary)]">
@@ -211,7 +210,7 @@ export default function SleepLog() {
                   </p>
                 </div>
 
-                <div className="rounded-[22px] border border-[rgba(197,168,255,0.16)] bg-white/[0.035] px-4 py-3">
+                <div className="log-readout">
                   <p className="data-kicker">Calculated duration</p>
                   <p className="mt-1 text-lg font-semibold tracking-[-0.03em] text-[var(--color-text-primary)]">
                     {formatDuration(durationMinutes)}
@@ -222,7 +221,7 @@ export default function SleepLog() {
               <div className="grid gap-5 lg:grid-cols-2">
                 <label
                   htmlFor="sleep_start"
-                  className="rounded-[28px] border border-[rgba(197,168,255,0.16)] bg-[rgba(7,10,24,0.34)] p-4 sm:p-5"
+                  className="log-section-card"
                 >
                   <span className="field-label mb-2 flex items-center gap-2">
                     <Moon className="h-4 w-4" />
@@ -242,7 +241,7 @@ export default function SleepLog() {
 
                 <label
                   htmlFor="sleep_end"
-                  className="rounded-[28px] border border-[rgba(197,168,255,0.16)] bg-[rgba(7,10,24,0.34)] p-4 sm:p-5"
+                  className="log-section-card"
                 >
                   <span className="field-label mb-2 flex items-center gap-2">
                     <Clock className="h-4 w-4" />
@@ -267,7 +266,7 @@ export default function SleepLog() {
                 </div>
               )}
 
-              <div className="mt-5 rounded-[28px] border border-[rgba(197,168,255,0.16)] bg-white/[0.035] p-4 sm:p-5">
+              <div className="mt-5 log-section-card">
                 <SliderField
                   label="Sleep Quality"
                   value={formData.quality}
@@ -279,11 +278,11 @@ export default function SleepLog() {
               </div>
             </section>
 
-            <aside className="signal-card signal-card-major h-fit p-5 sm:p-6 xl:sticky xl:top-6">
+            <aside className="log-summary-panel">
               <div className="mb-5 flex items-start justify-between gap-4">
                 <div>
-                  <p className="data-kicker">Recovery Signal</p>
-                  <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em] text-[var(--color-text-primary)]">
+                  <p className="data-kicker">Recovery summary</p>
+                  <h2 className="log-summary-title">
                     {formatDuration(durationMinutes)}
                   </h2>
                 </div>
@@ -293,7 +292,7 @@ export default function SleepLog() {
               </div>
 
               <div className="space-y-3">
-                <div className="rounded-2xl border border-[rgba(197,168,255,0.16)] bg-white/[0.035] p-4">
+                <div className="log-summary-note">
                   <p className="data-kicker">Logged At</p>
                   <p className="mt-2 text-sm leading-6 text-[var(--color-text-secondary)]">
                     Sleep entries use the bedtime and wake time as their primary window. The
@@ -306,7 +305,7 @@ export default function SleepLog() {
                   <SummaryMetric label="Interruptions" value={`${formData.interruptions}`} />
                 </div>
 
-                <div className="rounded-2xl border border-[rgba(197,168,255,0.16)] bg-white/[0.035] p-4">
+                <div className="log-summary-note">
                   <p className="data-kicker">Rested read</p>
                   <p className="mt-2 text-sm leading-6 text-[var(--color-text-secondary)]">
                     {formData.felt_rested
@@ -322,7 +321,7 @@ export default function SleepLog() {
                   className="w-full"
                 >
                   <Save className="mr-2 inline h-4 w-4" />
-                  {saving ? 'Saving...' : editingId ? 'Update Entry' : 'Save Sleep Signal'}
+                  {saving ? 'Saving...' : editingId ? 'Update Entry' : 'Save entry'}
                 </Button>
 
                 {editingId && (
@@ -334,7 +333,7 @@ export default function SleepLog() {
             </aside>
           </div>
 
-          <section className="rounded-[28px] border border-[rgba(197,168,255,0.14)] bg-white/[0.026] px-4 py-3 sm:px-5">
+          <section className="log-disclosure-panel">
             <button
               type="button"
               onClick={() => setShowDetails(!showDetails)}
@@ -357,11 +356,11 @@ export default function SleepLog() {
             </button>
 
             {showDetails && (
-              <div className="mt-5 grid gap-6 border-t border-white/8 pt-5 lg:grid-cols-[0.85fr_1.15fr]">
+              <div className="log-disclosure-content grid gap-5 lg:grid-cols-[0.85fr_1.15fr]">
                 <div className="space-y-4">
                   <label
                     htmlFor="interruptions"
-                    className="block rounded-[24px] border border-[rgba(197,168,255,0.14)] bg-white/[0.035] p-4"
+                    className="block log-section-card"
                   >
                     <span className="field-label mb-2 block">Number of Interruptions</span>
                     <input
@@ -380,7 +379,7 @@ export default function SleepLog() {
                     />
                   </label>
 
-                  <div className="rounded-[24px] border border-[rgba(197,168,255,0.14)] bg-white/[0.035] p-4">
+                  <div className="log-section-card">
                     <div className="flex items-center justify-between gap-3">
                       <div>
                         <p className="text-sm font-semibold text-[var(--color-text-secondary)]">
@@ -419,7 +418,7 @@ export default function SleepLog() {
           </section>
         </form>
       ) : (
-        <section className="surface-panel rounded-[32px] p-5 sm:p-6">
+        <section className="log-history-panel">
           {history.length === 0 ? (
             <EmptyState
               category="sleep"
@@ -450,7 +449,7 @@ export default function SleepLog() {
                         return (
                           <div
                             key={log.id}
-                            className="rounded-[24px] border border-[rgba(197,168,255,0.13)] bg-white/[0.035] p-4 transition-smooth hover:border-[rgba(197,168,255,0.22)] hover:bg-white/[0.05]"
+                            className="log-section-card transition-smooth hover:border-[rgba(197,168,255,0.22)] hover:bg-white/[0.05]"
                           >
                             <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                               <div>
@@ -580,7 +579,7 @@ function ToggleSwitch({ active, onToggle }: { active: boolean; onToggle: () => v
 
 function SummaryMetric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
+    <div className="log-summary-note">
       <p className="metric-label">{label}</p>
       <p className="mt-2 text-lg font-semibold tracking-[-0.03em] text-[var(--color-text-primary)]">
         {value}

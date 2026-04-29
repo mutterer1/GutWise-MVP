@@ -7,7 +7,6 @@ import {
   Gauge,
   Pencil,
   Save,
-  Sparkles,
   Zap,
 } from 'lucide-react';
 import Button from '../components/Button';
@@ -154,9 +153,9 @@ export default function ExerciseLog() {
 
   return (
     <LogPageShell
-      title="Movement Signal Capture"
+      title="Exercise Log"
       subtitle="Capture activity, duration, intensity, exertion, and environment so movement can be compared against digestion, stress, sleep, symptoms, and recovery."
-      eyebrow="Movement Intelligence Capture"
+      eyebrow="Movement entry"
       icon={<Dumbbell className="h-3.5 w-3.5" />}
       maxWidth="7xl"
       message={message}
@@ -177,15 +176,15 @@ export default function ExerciseLog() {
         <form onSubmit={handleSubmit} className="space-y-5">
           {editingId && <EditingBanner label="Editing movement entry" onCancel={handleReset} />}
 
-          <div className="grid gap-5 xl:grid-cols-[1.42fr_0.78fr]">
-            <section className="log-input-shell p-5 sm:p-6">
+          <div className="log-workflow-grid">
+            <section className="log-primary-panel">
               <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div>
-                  <span className="signal-badge signal-badge-major mb-4">
-                    <Sparkles className="h-3.5 w-3.5" />
-                    Movement Console
+                  <span className="clinical-chip clinical-chip-intelligence mb-3">
+                    <Dumbbell className="h-3.5 w-3.5" />
+                    Movement details
                   </span>
-                  <h2 className="text-3xl font-semibold tracking-[-0.04em] text-[var(--color-text-primary)]">
+                  <h2 className="log-section-title">
                     What movement happened?
                   </h2>
                   <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--color-text-secondary)]">
@@ -194,7 +193,7 @@ export default function ExerciseLog() {
                   </p>
                 </div>
 
-                <div className="rounded-[22px] border border-[rgba(197,168,255,0.16)] bg-white/[0.035] px-4 py-3">
+                <div className="log-readout">
                   <p className="data-kicker">Session read</p>
                   <p className="mt-1 text-lg font-semibold tracking-[-0.03em] text-[var(--color-text-primary)]">
                     {intensityLabels[formData.intensity_level]}
@@ -202,7 +201,7 @@ export default function ExerciseLog() {
                 </div>
               </div>
 
-              <div className="rounded-[28px] border border-[rgba(197,168,255,0.16)] bg-[rgba(7,10,24,0.34)] p-4 sm:p-5">
+              <div className="log-section-card">
                 <div className="mb-4">
                   <p className="data-kicker">Exercise Type</p>
                   <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
@@ -217,7 +216,7 @@ export default function ExerciseLog() {
                       type="button"
                       onClick={() => setFormData({ ...formData, exercise_type: type })}
                       className={[
-                        'rounded-[20px] border px-3 py-3 text-sm font-semibold transition-smooth',
+                        'log-option-button',
                         formData.exercise_type === type
                           ? 'border-[rgba(197,168,255,0.32)] bg-[rgba(139,92,246,0.14)] text-[var(--gw-intelligence-200)]'
                           : 'border-white/10 bg-white/[0.026] text-[var(--color-text-secondary)] hover:border-[rgba(197,168,255,0.2)] hover:bg-white/[0.045]',
@@ -252,7 +251,7 @@ export default function ExerciseLog() {
               </div>
 
               <div className="mt-5 grid gap-5 lg:grid-cols-[0.82fr_1.18fr]">
-                <div className="rounded-[28px] border border-[rgba(197,168,255,0.16)] bg-white/[0.035] p-4 sm:p-5">
+                <div className="log-section-card">
                   <label htmlFor="duration" className="field-label mb-2 block">
                     Duration (minutes)
                   </label>
@@ -291,7 +290,7 @@ export default function ExerciseLog() {
                   </div>
                 </div>
 
-                <div className="rounded-[28px] border border-[rgba(197,168,255,0.16)] bg-white/[0.035] p-4 sm:p-5">
+                <div className="log-section-card">
                   <SliderField
                     label="Intensity"
                     value={formData.intensity_level}
@@ -305,11 +304,11 @@ export default function ExerciseLog() {
               </div>
             </section>
 
-            <aside className="signal-card signal-card-major h-fit p-5 sm:p-6 xl:sticky xl:top-6">
+            <aside className="log-summary-panel">
               <div className="mb-5 flex items-start justify-between gap-4">
                 <div>
-                  <p className="data-kicker">Movement Signal</p>
-                  <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em] text-[var(--color-text-primary)]">
+                  <p className="data-kicker">Movement summary</p>
+                  <h2 className="log-summary-title">
                     {formData.exercise_type || 'Activity pending'}
                   </h2>
                 </div>
@@ -341,7 +340,7 @@ export default function ExerciseLog() {
                   <SummaryMetric label="Intensity" value={`${formData.intensity_level}/5`} />
                 </div>
 
-                <div className="rounded-2xl border border-[rgba(197,168,255,0.16)] bg-white/[0.035] p-4">
+                <div className="log-summary-note">
                   <p className="data-kicker">Session context</p>
                   <p className="mt-2 text-sm leading-6 text-[var(--color-text-secondary)]">
                     {intensityLabels[formData.intensity_level]}
@@ -359,7 +358,7 @@ export default function ExerciseLog() {
                   className="w-full"
                 >
                   <Save className="mr-2 inline h-4 w-4" />
-                  {saving ? 'Saving...' : editingId ? 'Update Entry' : 'Save Movement Signal'}
+                  {saving ? 'Saving...' : editingId ? 'Update Entry' : 'Save entry'}
                 </Button>
 
                 {editingId && (
@@ -371,7 +370,7 @@ export default function ExerciseLog() {
             </aside>
           </div>
 
-          <section className="rounded-[28px] border border-[rgba(197,168,255,0.14)] bg-white/[0.026] px-4 py-3 sm:px-5">
+          <section className="log-disclosure-panel">
             <button
               type="button"
               onClick={() => setShowDetails(!showDetails)}
@@ -394,9 +393,9 @@ export default function ExerciseLog() {
             </button>
 
             {showDetails && (
-              <div className="mt-5 grid gap-6 border-t border-white/8 pt-5 lg:grid-cols-[0.9fr_1.1fr]">
+              <div className="log-disclosure-content grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
                 <div className="space-y-5">
-                  <div className="rounded-[24px] border border-[rgba(197,168,255,0.14)] bg-white/[0.035] p-4">
+                  <div className="log-section-card">
                     <SliderField
                       label="Perceived Exertion"
                       value={formData.perceived_exertion ?? 5}
@@ -423,7 +422,7 @@ export default function ExerciseLog() {
                     )}
                   </div>
 
-                  <div className="rounded-[24px] border border-[rgba(197,168,255,0.14)] bg-white/[0.035] p-4">
+                  <div className="log-section-card">
                     <div className="mb-3">
                       <p className="data-kicker">Location</p>
                       <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
@@ -475,7 +474,7 @@ export default function ExerciseLog() {
           </section>
         </form>
       ) : (
-        <section className="surface-panel rounded-[32px] p-5 sm:p-6">
+        <section className="log-history-panel">
           {history.length === 0 ? (
             <EmptyState
               category="exercise"
@@ -500,7 +499,7 @@ export default function ExerciseLog() {
                       {group.entries.map((log) => (
                         <div
                           key={log.id}
-                          className="rounded-[24px] border border-[rgba(197,168,255,0.13)] bg-white/[0.035] p-4 transition-smooth hover:border-[rgba(197,168,255,0.22)] hover:bg-white/[0.05]"
+                          className="log-section-card transition-smooth hover:border-[rgba(197,168,255,0.22)] hover:bg-white/[0.05]"
                         >
                           <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                             <div>
@@ -622,7 +621,7 @@ function SliderField({
 
 function SummaryMetric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
+    <div className="log-summary-note">
       <p className="metric-label">{label}</p>
       <p className="mt-2 text-lg font-semibold tracking-[-0.03em] text-[var(--color-text-primary)]">
         {value}

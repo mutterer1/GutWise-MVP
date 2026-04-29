@@ -66,7 +66,7 @@ export default function LogPageShell({
                   <p className="data-kicker">Capture standard</p>
                   <p className="mt-2 text-sm leading-5 text-[var(--color-text-secondary)]">
                     Log the primary event first. Add optional context only when it improves the
-                    signal.
+                    entry.
                   </p>
                 </div>
               </div>
