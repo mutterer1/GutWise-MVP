@@ -33,7 +33,6 @@ A comprehensive health tracking web application built with **React**, **TypeScri
 
 ### Root Level (Configuration)
 ```
-.bolt/                    - Bolt.new configuration
 .env                     - Environment variables
 .gitignore               - Git ignore rules
 index.html               - HTML entry point

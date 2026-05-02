@@ -4,10 +4,6 @@
 
 ```
 project-root/
-┣ .bolt/                                          # Bolt.new configuration
-┃ ┣ config.json
-┃ ┣ mcp.json
-┃ ┗ prompt
 ┣ .env                                            # Environment variables (LOCAL)
 ┣ .gitignore                                      # Git ignore rules
 ┣ index.html                                      # HTML entry point

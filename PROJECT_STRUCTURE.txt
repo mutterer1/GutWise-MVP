@@ -2,10 +2,6 @@ PROJECT FILE TREE - HEALTH TRACKING APPLICATION
 ================================================
 
 project-root/
-┣ .bolt/                                    # Bolt.new configuration
-┃ ┣ config.json
-┃ ┣ mcp.json
-┃ ┗ prompt
 ┣ src/                                      # SOURCE CODE
 ┃ ┣ App.tsx                                 # (UPDATED) Main app + hook integration
 ┃ ┣ main.tsx                                # App entry point
